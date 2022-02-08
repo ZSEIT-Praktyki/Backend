@@ -1,0 +1,10 @@
+{
+  "type": "mysql",
+  "host": "localhost",
+  "port": 3306,
+  "username": "dmq",
+  "password": "",
+  "database": "shop_praktyki",
+  "entities": ["dist/**/*.entity{.ts,.js}"],
+  "synchronize": true
+}
