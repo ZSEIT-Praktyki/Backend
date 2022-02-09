@@ -43,8 +43,6 @@ export class ListingsEntity {
   @Column({ type: 'bool' })
   isActive: boolean;
 
-  // relations subcategory_id, seller_id
-
   @ManyToOne(() => UserEntity, (type) => type.id)
   @JoinColumn({ name: 'seller_id' })
   seller_id: UserEntity;

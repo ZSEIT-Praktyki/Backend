@@ -22,7 +22,7 @@ export class UserController {
   ) {
     this.userService.getOneByEmail(email).then((user) => {
       if (typeof user === 'undefined') {
-        return response.status(404).send(userNotFound);
+        return response.status(400).send(userNotFound);
       }
 
       this.userService

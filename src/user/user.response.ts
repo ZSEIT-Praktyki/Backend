@@ -1,7 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 
 export const userNotFound = {
-  statusCode: HttpStatus.NOT_FOUND,
+  statusCode: HttpStatus.BAD_REQUEST,
   message: 'Account not found',
 };
 
