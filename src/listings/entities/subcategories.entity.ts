@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { CategoriesEntity } from './categories.entity';
 
 @Entity('subcategories')
 export class SubcategoriesEntity {
@@ -10,4 +17,8 @@ export class SubcategoriesEntity {
 
   @Column({ type: 'text' })
   description: string;
+
+  @ManyToOne(() => CategoriesEntity, (type) => type.category_id)
+  @JoinColumn({ name: 'category_id' })
+  category_id: number;
 }

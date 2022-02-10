@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import User from 'src/decorators/User.decorator';
 import { ListingsDto } from '../dto/Listings.dto';
 import { CreateGuard } from '../listings.guard';
@@ -12,6 +20,11 @@ export class ListingsController {
   @Get('/')
   getAllListings() {
     return this.listingsService.getAll();
+  }
+
+  @Get('/:id')
+  getListingById(@Param('id') id: number) {
+    return this.listingsService.getById(id);
   }
 
   @Post()

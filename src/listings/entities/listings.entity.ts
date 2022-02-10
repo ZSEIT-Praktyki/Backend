@@ -9,6 +9,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { ListingsImagesEntity } from './listings-images.entity';
+import { SubcategoriesEntity } from './subcategories.entity';
 
 export enum Condition {
   NEW,
@@ -51,4 +52,8 @@ export class ListingsEntity {
   @OneToMany(() => ListingsImagesEntity, (type) => type.listing_id)
   @JoinColumn({ name: 'images' })
   images: ListingsImagesEntity[];
+
+  @ManyToOne(() => SubcategoriesEntity, (type) => type.subcategory_id)
+  @JoinColumn({ name: 'subcategory_id' })
+  subcategory_id: number;
 }

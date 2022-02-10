@@ -36,8 +36,25 @@ export class ListingsService {
 
   getAll() {
     return this.listingsRepo.find({
-      relations: ['seller_id', 'images'],
+      relations: [
+        'seller_id',
+        'images',
+        'subcategory_id',
+        'subcategory_id.category_id',
+      ],
       where: { isActive: true },
+    });
+  }
+
+  getById(id: number) {
+    return this.listingsRepo.findOne({
+      relations: [
+        'seller_id',
+        'images',
+        'subcategory_id',
+        'subcategory_id.category_id',
+      ],
+      where: { listing_id: id },
     });
   }
 }
