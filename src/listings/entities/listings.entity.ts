@@ -6,10 +6,11 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  CreateDateColumn,
 } from 'typeorm';
 import { ListingsImagesEntity } from './listings-images.entity';
 
-enum Condition {
+export enum Condition {
   NEW,
   USED,
 }
@@ -34,11 +35,11 @@ export class ListingsEntity {
   @Column({ type: 'int', nullable: false })
   quantity: number;
 
-  /*  @CreateDateColumn({ insert: true, type: 'timestamp' })
+  @CreateDateColumn({ insert: true, type: 'timestamp' })
   added_date: Date;
 
   @Column({ type: 'timestamp', nullable: false })
-  ending_date: Date; */
+  ending_date: Date;
 
   @Column({ type: 'bool' })
   isActive: boolean;

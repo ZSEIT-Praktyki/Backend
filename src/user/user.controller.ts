@@ -33,13 +33,13 @@ export class UserController {
           }
           const jwt = this.userService.createJWT({ email, id: user.id });
 
-          response.cookie('token', JSON.stringify({ token: jwt }), {
+          /* response.cookie('token', JSON.stringify({ token: jwt }), {
             secure: process.env.NODE_ENV !== 'development',
             httpOnly: true,
             expires: dayjs().add(1, 'days').toDate(),
-          });
+          }); */
 
-          response.send(loginResponse);
+          response.send({ ...loginResponse, token: jwt });
         });
     });
   }
@@ -58,7 +58,20 @@ export class UserController {
           .createUser({ email, password: hashed })
           .then(({ raw }) => {
             if (raw.affectedRows > 0) {
-              return response.status(201).send(userRegistered);
+              const jwt = this.userService.createJWT({
+                email,
+                id: raw.insertId,
+              });
+
+              /*  response.cookie('token', JSON.stringify({ token: jwt }), {
+                secure: process.env.NODE_ENV !== 'development',
+                httpOnly: true,
+                expires: dayjs().add(1, 'days').toDate(),
+              }); */
+
+              return response
+                .status(201)
+                .send({ ...userRegistered, token: jwt });
             }
           });
       });
