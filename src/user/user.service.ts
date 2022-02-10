@@ -6,7 +6,7 @@ import { UserEntity } from './user.entity';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 
-const SECRET = process.env.JWT_SECRET || 'development';
+export const SECRET = process.env.JWT_SECRET || 'development';
 
 @Injectable()
 export class UserService {
@@ -47,8 +47,8 @@ export class UserService {
       expiresIn: '2d',
     });
   }
-  verifyJWT(token: string) {
-    return jwt.verify(token, SECRET);
+  verifyJWT<T>(token: string, fn: (err: unknown, decoded: T) => void) {
+    return jwt.verify(token, SECRET, fn);
   }
 
   hashPassword(password: string): Promise<string> {
