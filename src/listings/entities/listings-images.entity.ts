@@ -12,8 +12,8 @@ export class ListingsImagesEntity {
   @PrimaryGeneratedColumn()
   photo_id: number;
 
-  @Column({ type: 'char' })
-  location: string;
+  @Column({ type: 'varchar' })
+  filename: string;
 
   @Column({ type: 'int' }) // max 1 length
   order: number;

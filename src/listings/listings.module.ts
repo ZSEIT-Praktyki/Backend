@@ -7,9 +7,14 @@ import { ListingsService } from './services/listings.service';
 import { SubcategoriesEntity } from './entities/subcategories.entity';
 import { CategoriesEntity } from './entities/categories.entity';
 import { ImagesController } from './controllers/images.controller';
+import { MulterModule } from '@nestjs/platform-express';
+import { ImagesService } from './services/images.service';
 
 @Module({
   imports: [
+    MulterModule.register({
+      dest: './upload',
+    }),
     TypeOrmModule.forFeature([
       ListingsImagesEntity,
       ListingsEntity,
@@ -18,6 +23,6 @@ import { ImagesController } from './controllers/images.controller';
     ]),
   ],
   controllers: [ListingsController, ImagesController],
-  providers: [ListingsService],
+  providers: [ListingsService, ImagesService],
 })
 export class ListingsModule {}
