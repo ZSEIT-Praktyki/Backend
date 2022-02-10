@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
 import { Response } from 'express';
@@ -10,6 +10,7 @@ import {
   userRegistered,
 } from './user.response';
 import * as dayjs from 'dayjs';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -33,13 +34,13 @@ export class UserController {
           }
           const jwt = this.userService.createJWT({ email, id: user.id });
 
-          /* response.cookie('token', JSON.stringify({ token: jwt }), {
-            secure: process.env.NODE_ENV !== 'development',
-            httpOnly: true,
-            expires: dayjs().add(1, 'days').toDate(),
-          }); */
-
-          response.send({ ...loginResponse, token: jwt });
+          response
+            .cookie('token', JSON.stringify({ token: jwt }), {
+              httpOnly: true,
+              expires: dayjs().add(1, 'days').toDate(),
+            })
+            .status(200)
+            .send({ ...loginResponse });
         });
     });
   }
@@ -63,15 +64,13 @@ export class UserController {
                 id: raw.insertId,
               });
 
-              /*  response.cookie('token', JSON.stringify({ token: jwt }), {
-                secure: process.env.NODE_ENV !== 'development',
-                httpOnly: true,
-                expires: dayjs().add(1, 'days').toDate(),
-              }); */
-
-              return response
-                .status(201)
-                .send({ ...userRegistered, token: jwt });
+              response
+                .cookie('token', JSON.stringify({ token: jwt }), {
+                  httpOnly: true,
+                  expires: dayjs().add(1, 'days').toDate(),
+                })
+                .status(200)
+                .send({ ...loginResponse });
             }
           });
       });

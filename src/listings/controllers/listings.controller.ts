@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import User from 'src/decorators/User.decorator';
 import { ListingsDto } from '../dto/Listings.dto';
-import { CreateGuard } from '../listings.guard';
+import { AuthGuard } from '../../guards/auth.guard';
 import { ListingsService } from '../services/listings.service';
 import { Response } from 'express';
 
@@ -28,7 +28,7 @@ export class ListingsController {
   }
 
   @Post()
-  @UseGuards(CreateGuard)
+  @UseGuards(AuthGuard)
   async createListing(
     @Body() props: ListingsDto,
     @User() id: number,
