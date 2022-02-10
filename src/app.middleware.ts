@@ -6,11 +6,11 @@ import { UserService } from './user/user.service';
 export class AppMiddleware implements NestMiddleware {
   constructor(private usersService: UserService) {}
   use(req: any, res: Response, next: NextFunction) {
-    const token = req.headers['token'];
+    const token = req.cookies['token'];
 
     if (typeof token !== 'undefined') {
       this.usersService.verifyJWT<{ email: string; id: number }>(
-        token as string,
+        JSON.parse(token).token,
         (err, decoded) => {
           if (err) {
           }
