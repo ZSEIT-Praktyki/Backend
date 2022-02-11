@@ -1,17 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import deleteObjectFields from 'src/utils/helpers/deleteObjectFields';
+import { Like, Repository } from 'typeorm';
 import { Condition, ListingsEntity } from '../entities/listings.entity';
-
-interface ListingProps {
-  title: string;
-  description: string;
-  condition: Condition;
-  price: number;
-  quantity: number;
-  seller_id: any;
-  subcategory_id: number;
-}
+import type { ListingProps } from '../listings.inteface';
 
 @Injectable()
 export class ListingsService {
@@ -34,7 +26,7 @@ export class ListingsService {
       });
   }
 
-  getAll() {
+  getAll(skip = 0) {
     return this.listingsRepo.find({
       relations: [
         'seller_id',
@@ -42,19 +34,58 @@ export class ListingsService {
         'subcategory_id',
         'subcategory_id.category_id',
       ],
+      skip: skip,
+      take: 10,
       where: { isActive: true },
     });
   }
 
-  getById(id: number) {
-    return this.listingsRepo.findOne({
-      relations: [
-        'seller_id',
-        'images',
-        'subcategory_id',
-        'subcategory_id.category_id',
-      ],
-      where: { listing_id: id },
-    });
+  async getById(id: number) {
+    return this.listingsRepo
+      .findOne({
+        relations: [
+          'seller_id',
+          'images',
+          'subcategory_id',
+          'subcategory_id.category_id',
+        ],
+        where: { listing_id: id },
+      })
+      .then((response) => {
+        return {
+          ...response,
+          seller_id: deleteObjectFields(response?.seller_id, [
+            'password',
+            'activated',
+          ]),
+        };
+      });
+  }
+
+  async getByQueryText(text: string) {
+    return this.listingsRepo
+      .find({
+        relations: [
+          'seller_id',
+          'images',
+          'subcategory_id',
+          'subcategory_id.category_id',
+        ],
+        where: [
+          {
+            title: Like(`%${text}%`),
+          },
+          { description: Like(`%${text}%`) },
+        ],
+      })
+      .then((res) => {
+        return res.map((prop) => ({
+          ...prop,
+          seller_id: deleteObjectFields(prop.seller_id, [
+            'password',
+            'activated',
+          ]),
+        }));
+      });
   }
 }
