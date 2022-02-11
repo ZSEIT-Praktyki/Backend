@@ -9,6 +9,7 @@ import { CategoriesEntity } from './entities/categories.entity';
 import { ImagesController } from './controllers/images.controller';
 import { MulterModule } from '@nestjs/platform-express';
 import { ImagesService } from './services/images.service';
+import { ManagmentController } from './controllers/managment.controller';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { ImagesService } from './services/images.service';
       CategoriesEntity,
     ]),
   ],
-  controllers: [ListingsController, ImagesController],
+  controllers: [ListingsController, ImagesController, ManagmentController],
   providers: [ListingsService, ImagesService],
 })
 export class ListingsModule {}

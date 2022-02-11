@@ -39,7 +39,7 @@ export class ListingsEntity {
   @CreateDateColumn({ insert: true, type: 'timestamp' })
   added_date: Date;
 
-  @Column({ type: 'timestamp', nullable: false })
+  @Column({ type: 'timestamp', nullable: true })
   ending_date: Date;
 
   @Column({ type: 'bool' })

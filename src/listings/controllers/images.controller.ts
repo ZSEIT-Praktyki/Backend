@@ -37,14 +37,7 @@ export class ImagesController {
     @Res() response: Response,
   ) {
     if (files) {
-      const mapped = files.map(({ filename }, i) =>
-        this.imagesService.insertOne({
-          filename,
-          listing_id: id,
-          order: i,
-        }),
-      );
-      Promise.all(mapped).then((res) => {
+      this.imagesService.insertMultiple(files, id).then((res) => {
         if (res.every((v) => v > 0)) {
           return response.status(201).send({
             statusCode: 201,

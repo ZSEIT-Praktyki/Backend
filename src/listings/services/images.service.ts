@@ -21,4 +21,18 @@ export class ImagesService {
       .insert(props)
       .then(({ raw }) => raw.affectedRows);
   }
+
+  public async insertMultiple(
+    files: Express.Multer.File[],
+    id: number,
+  ): Promise<number[]> {
+    const mapped = files.map(({ filename }, i) =>
+      this.insertOne({
+        filename,
+        listing_id: id,
+        order: i,
+      }),
+    );
+    return Promise.all(mapped);
+  }
 }
