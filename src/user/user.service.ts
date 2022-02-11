@@ -18,7 +18,10 @@ export class UserService {
   async checkIfExists(email: string): Promise<boolean> {
     return this.userRepository
       .findOne({
-        email,
+        where: {
+          email,
+        },
+        select: ['id'],
       })
       .then((response) => {
         if (typeof response !== 'undefined') {
@@ -39,7 +42,12 @@ export class UserService {
   }
 
   getOneByEmail(email: string): Promise<UserEntity> {
-    return this.userRepository.findOne({ email });
+    return this.userRepository.findOne({
+      where: {
+        email,
+      },
+      select: ['password', 'id', 'email'],
+    });
   }
 
   createJWT<T extends {}>(props: T): string {

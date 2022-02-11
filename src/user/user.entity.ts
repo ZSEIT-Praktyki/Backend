@@ -13,10 +13,10 @@ export class UserEntity {
   @Column({ unique: true, type: 'varchar', length: '70', nullable: false })
   email: string;
 
-  @Column({ type: 'varchar', length: '60', nullable: false })
+  @Column({ type: 'varchar', length: '60', nullable: false, select: false })
   password: string;
 
-  @Column({ type: 'bool', nullable: false, default: false })
+  @Column({ type: 'bool', nullable: false, default: false, select: false })
   activated: boolean;
 
   @CreateDateColumn({ type: 'timestamp' })

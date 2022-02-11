@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 
 import { ListingsService } from '../services/listings.service';
 
@@ -16,7 +16,17 @@ export class ListingsController {
     return this.listingsService.getByQueryText(query);
   }
 
-  @Get('/:id')
+  @Get('/subcategory')
+  getLisingBySubCategory(@Query('subCatId', ParseIntPipe) subCatId: number) {
+    return this.listingsService.getbySubCategory(subCatId);
+  }
+
+  @Get('/category')
+  getListingsByCategory(@Query('catId', ParseIntPipe) catId: number) {
+    return this.listingsService.getByCategory(catId);
+  }
+
+  @Get('/:id') // must be last
   getListingById(@Param('id') id: number) {
     return this.listingsService.getById(id);
   }
