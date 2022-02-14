@@ -10,6 +10,7 @@ import { ImagesController } from './controllers/images.controller';
 import { MulterModule } from '@nestjs/platform-express';
 import { ImagesService } from './services/images.service';
 import { ManagmentController } from './controllers/managment.controller';
+import { ManagmentService } from './services/managment.service';
 
 @Module({
   imports: [
@@ -24,6 +25,6 @@ import { ManagmentController } from './controllers/managment.controller';
     ]),
   ],
   controllers: [ListingsController, ImagesController, ManagmentController],
-  providers: [ListingsService, ImagesService],
+  providers: [ListingsService, ImagesService, ManagmentService],
 })
 export class ListingsModule {}

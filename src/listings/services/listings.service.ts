@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
-import { Condition, ListingsEntity } from '../entities/listings.entity';
-import type { ListingProps } from '../listings.inteface';
+import { ListingsEntity } from '../entities/listings.entity';
 
 @Injectable()
 export class ListingsService {
@@ -17,20 +16,6 @@ export class ListingsService {
     'subcategory_id',
     'subcategory_id.category_id',
   ];
-
-  async insertListing(props: ListingProps) {
-    return this.listingsRepo
-      .insert({
-        ...props,
-        condition:
-          props.condition === Condition.NEW ? Condition.NEW : Condition.USED,
-        isActive: true,
-      })
-      .then(({ raw }) => {
-        if (raw.affectedRows > 0) return true;
-        return false;
-      });
-  }
 
   getAll(skip = 0) {
     return this.listingsRepo.find({
