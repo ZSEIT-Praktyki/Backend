@@ -1,6 +1,14 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ListingsService } from '../services/listings.service';
+import { Response } from 'express';
 
 @ApiTags('listings')
 @Controller('listings')
@@ -40,7 +48,15 @@ export class ListingsController {
   }
 
   @Get('/:id') // must be last
-  getListingById(@Param('id') id: number) {
-    return this.listingsService.getById(id);
+  async getListingById(@Param('id') id: number, @Res() response: Response) {
+    try {
+      const res = await this.listingsService.getById(id);
+      return response.send(res);
+    } catch (error) {
+      return response.status(400).send({
+        statusCode: 404,
+        message: 'Post not found',
+      });
+    }
   }
 }

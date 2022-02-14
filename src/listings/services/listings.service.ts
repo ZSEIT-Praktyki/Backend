@@ -27,7 +27,7 @@ export class ListingsService {
   }
 
   getById(id: number) {
-    return this.listingsRepo.findOne({
+    return this.listingsRepo.findOneOrFail({
       relations: this.relations,
       where: { listing_id: id },
     });
