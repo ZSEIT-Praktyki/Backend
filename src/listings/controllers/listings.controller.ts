@@ -29,6 +29,11 @@ export class ListingsController {
     return this.listingsService.getbySubCategory(subCatId);
   }
 
+  @Get('/seller/:seller_id')
+  getSellerListings(@Param('seller_id', ParseIntPipe) seller_id: number) {
+    return this.listingsService.getSellerListings(seller_id);
+  }
+
   @Get('/category')
   getListingsByCategory(@Query('catId', ParseIntPipe) catId: number) {
     return this.listingsService.getByCategory(catId);

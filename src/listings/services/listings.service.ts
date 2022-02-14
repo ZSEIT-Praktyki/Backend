@@ -84,6 +84,13 @@ export class ListingsService {
       .getMany();
   }
 
+  getSellerListings(seller_id: number) {
+    return this.listingsRepo.find({
+      where: { seller_id },
+      relations: this.relations,
+    });
+  }
+
   hasPermissionToEdit(listing_id: number, seller_id: number) {
     return this.listingsRepo.findOne({
       where: {
