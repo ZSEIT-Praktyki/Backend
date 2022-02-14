@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
 import { Response } from 'express';
@@ -7,15 +7,24 @@ import {
   loginResponse,
   userExistsError,
   userNotFound,
-  userRegistered,
 } from './user.response';
 import * as dayjs from 'dayjs';
-import { AuthGuard } from 'src/guards/auth.guard';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
+@ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @ApiOkResponse({
+    description: 'sends cookie back with some successfull message',
+  })
+  @ApiBadRequestResponse({ description: 'Return bad response with reason' })
   @Post('/login')
   async loginUser(
     @Body() { email, password }: UserDto,
@@ -45,6 +54,10 @@ export class UserController {
     });
   }
 
+  @ApiCreatedResponse({
+    description: 'sends cookie back with some successfull message',
+  })
+  @ApiBadRequestResponse({ description: 'Return bad response with reason' })
   @Post('/register')
   registerUser(
     @Body() { email, password }: UserDto,

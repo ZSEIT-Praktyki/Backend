@@ -1,16 +1,24 @@
 import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
-
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ListingsService } from '../services/listings.service';
 
+@ApiTags('listings')
 @Controller('listings')
 export class ListingsController {
   constructor(private listingsService: ListingsService) {}
 
+  @ApiOkResponse({
+    description: 'Returns Array of objects containing listings',
+  })
   @Get('/')
   getAllListings(@Query('skip') skip: number) {
     return this.listingsService.getAll(skip);
   }
 
+  @ApiOkResponse({
+    description:
+      'Returns Array of objects containing listings matching query param',
+  })
   @Get('/search')
   getSearched(@Query('query') query: string) {
     return this.listingsService.getByQueryText(query);
