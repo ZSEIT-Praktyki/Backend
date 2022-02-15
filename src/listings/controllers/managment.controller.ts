@@ -9,7 +9,6 @@ import {
   ParseIntPipe,
   BadRequestException,
   ForbiddenException,
-  UseFilters,
 } from '@nestjs/common';
 import User from '../../decorators/User.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
@@ -17,9 +16,7 @@ import { Response } from 'express';
 import { ListingsDto } from '../dto/Listings.dto';
 import { ManagmentService } from '../services/managment.service';
 import { ApiTags } from '@nestjs/swagger';
-import { HttpErrorFilter } from 'src/filters/HttpErrorFilter';
 
-@UseFilters(HttpErrorFilter)
 @ApiTags('managment')
 @Controller('/listings/managment')
 export class ManagmentController {

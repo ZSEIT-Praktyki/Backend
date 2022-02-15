@@ -6,7 +6,6 @@ import { OrdersService } from './orders.service';
 import { ReviewsEntity } from './entities/reviews.entity';
 import { StatesEntity } from './entities/states.entity';
 import { UserAddresses } from './entities/user-addresses.entity';
-import { WatchListEntity } from './entities/watchlist.entity';
 
 @Module({
   imports: [
@@ -14,7 +13,6 @@ import { WatchListEntity } from './entities/watchlist.entity';
       OrderEntity,
       UserAddresses,
       StatesEntity,
-      WatchListEntity,
       ReviewsEntity,
     ]),
   ],

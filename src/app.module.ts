@@ -4,16 +4,16 @@ import { UserModule } from './user/user.module';
 import { ListingsModule } from './listings/listings.module';
 import { AppMiddleware } from './app.middleware';
 import { OrdersModule } from './orders/orders.module';
-import { APP_FILTER } from '@nestjs/core';
-import { HttpErrorFilter } from './filters/HttpErrorFilter';
+
+import { WatchlistModule } from './watchlist/watchlist.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(), UserModule, ListingsModule, OrdersModule],
-  providers: [
-    {
-      provide: APP_FILTER,
-      useClass: HttpErrorFilter,
-    },
+  imports: [
+    TypeOrmModule.forRoot(),
+    UserModule,
+    ListingsModule,
+    OrdersModule,
+    WatchlistModule,
   ],
 })
 export class AppModule implements NestModule {
