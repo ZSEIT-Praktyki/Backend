@@ -1,11 +1,11 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { UserService } from './user/user.service';
 
 @Injectable()
 export class AppMiddleware implements NestMiddleware {
   constructor(private usersService: UserService) {}
-  use(req: any, res: Response, next: NextFunction) {
+  use(req: any, _: Response, next: NextFunction) {
     const token = req.cookies['token'];
 
     if (typeof token !== 'undefined') {

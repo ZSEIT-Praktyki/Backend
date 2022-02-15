@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   Param,
@@ -40,6 +41,7 @@ export class ImagesController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: 'Takes array of images with key: image',
+    required: true,
   })
   @ApiBadRequestResponse({
     status: 400,
@@ -64,10 +66,7 @@ export class ImagesController {
             images: files.map(({ filename }) => filename),
           });
         } else {
-          response.status(400).send({
-            statusCode: 400,
-            error: 'Something went wrong',
-          });
+          throw new BadRequestException();
         }
       });
     }
