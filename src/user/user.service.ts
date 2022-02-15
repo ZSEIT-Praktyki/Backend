@@ -65,4 +65,8 @@ export class UserService {
   comparePassword(password: string, encrypted: string) {
     return bcrypt.compare(password, encrypted);
   }
+
+  getCredentials(user_id: number) {
+    return this.userRepository.findOne(user_id);
+  }
 }

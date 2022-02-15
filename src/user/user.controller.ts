@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
 import { Response } from 'express';
@@ -15,6 +15,8 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import User from 'src/decorators/User.decorator';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @ApiTags('user')
 @Controller('user')
@@ -88,5 +90,27 @@ export class UserController {
           });
       });
     });
+  }
+
+  @Post('/cookie')
+  @UseGuards(AuthGuard)
+  reedemCookie(@User() id: number, @Res() response: Response) {
+    const token = this.userService.createJWT({ id });
+
+    response
+      .cookie('token', JSON.stringify({ token }), {
+        httpOnly: true,
+        expires: dayjs().add(1, 'days').toDate(),
+      })
+      .status(200)
+      .send({
+        statusCode: 200,
+        message: 'cookie set',
+      });
+  }
+
+  @Get('/credentials')
+  getUserCredentials(@User() id: number) {
+    return this.userService.getCredentials(id);
   }
 }
