@@ -19,6 +19,8 @@ export class ListingsService {
 
   getAll(skip = 0) {
     return this.listingsRepo.find({
+      //prettier-ignore
+      select:["listing_id","title","price","condition","seller_id","added_date","images","subcategory_id"],
       relations: this.relations,
       skip: skip,
       take: 10,
@@ -29,7 +31,7 @@ export class ListingsService {
   getById(id: number) {
     return this.listingsRepo.findOneOrFail({
       relations: this.relations,
-      where: { listing_id: id },
+      where: { listing_id: id, isActive: true },
     });
   }
 
@@ -73,15 +75,6 @@ export class ListingsService {
     return this.listingsRepo.find({
       where: { seller_id },
       relations: this.relations,
-    });
-  }
-
-  hasPermissionToEdit(listing_id: number, seller_id: number) {
-    return this.listingsRepo.findOne({
-      where: {
-        listing_id,
-        seller_id,
-      },
     });
   }
 }

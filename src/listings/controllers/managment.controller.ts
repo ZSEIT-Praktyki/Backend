@@ -7,7 +7,9 @@ import {
   Put,
   Param,
   ParseIntPipe,
-  HttpStatus,
+  BadRequestException,
+  ForbiddenException,
+  UseFilters,
 } from '@nestjs/common';
 import User from '../../decorators/User.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
@@ -15,7 +17,9 @@ import { Response } from 'express';
 import { ListingsDto } from '../dto/Listings.dto';
 import { ManagmentService } from '../services/managment.service';
 import { ApiTags } from '@nestjs/swagger';
+import { HttpErrorFilter } from 'src/filters/HttpErrorFilter';
 
+@UseFilters(HttpErrorFilter)
 @ApiTags('managment')
 @Controller('/listings/managment')
 export class ManagmentController {
@@ -32,10 +36,7 @@ export class ManagmentController {
       .insertListing({ ...props, seller_id: id })
       .then((succ) => {
         if (!succ) {
-          return response.status(400).send({
-            statusCode: 400,
-            message: 'Something went wrong try again',
-          });
+          throw new BadRequestException();
         }
         response.status(201).send({
           statusCode: 201,
@@ -55,11 +56,12 @@ export class ManagmentController {
     try {
       await this.managmentService.hasPermission(seller_id, listing_id);
       await this.managmentService.archivizeListing(listing_id);
-    } catch (error) {
-      return response.status(400).send({
-        statusCode: HttpStatus.BAD_REQUEST,
-        message: 'Listing not found or you have no permisson',
+      return response.status(200).send({
+        statusCode: 200,
+        message: 'Success',
       });
+    } catch (error) {
+      throw new BadRequestException();
     }
   }
 
@@ -83,15 +85,9 @@ export class ManagmentController {
           message: 'updated',
         });
       }
-      return response.status(400).send({
-        statusCode: 400,
-        message: 'someting went wrong',
-      });
+      throw new BadRequestException();
     } catch (error) {
-      return response.status(400).send({
-        statusCode: HttpStatus.BAD_REQUEST,
-        message: 'Listing not found or you have no permisson',
-      });
+      throw new ForbiddenException();
     }
   }
 }

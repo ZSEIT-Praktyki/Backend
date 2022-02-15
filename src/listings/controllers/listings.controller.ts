@@ -1,15 +1,19 @@
 import {
   Controller,
   Get,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Query,
   Res,
+  UseFilters,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ListingsService } from '../services/listings.service';
 import { Response } from 'express';
+import { HttpErrorFilter } from 'src/filters/HttpErrorFilter';
 
+@UseFilters(HttpErrorFilter)
 @ApiTags('listings')
 @Controller('listings')
 export class ListingsController {
@@ -53,10 +57,7 @@ export class ListingsController {
       const res = await this.listingsService.getById(id);
       return response.send(res);
     } catch (error) {
-      return response.status(400).send({
-        statusCode: 404,
-        message: 'Post not found',
-      });
+      throw new NotFoundException();
     }
   }
 }
