@@ -10,12 +10,7 @@ export class ListingsService {
     private listingsRepo: Repository<ListingsEntity>,
   ) {}
 
-  private relations = [
-    'seller_id',
-    'images',
-    'subcategory_id',
-    'subcategory_id.category_id',
-  ];
+  private relations = ['seller_id', 'images', 'subcategory_id', 'subcategory_id.category_id'];
 
   getAll(skip = 0) {
     return this.listingsRepo.find({
@@ -44,6 +39,12 @@ export class ListingsService {
         },
         { description: Like(`%${text}%`) },
       ],
+    });
+  }
+
+  getAllIds() {
+    return this.listingsRepo.find({
+      select: ['listing_id'],
     });
   }
 

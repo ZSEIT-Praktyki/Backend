@@ -6,16 +6,10 @@ import { OrdersService } from './orders.service';
 import { ReviewsEntity } from './entities/reviews.entity';
 import { StatesEntity } from './entities/states.entity';
 import { UserAddresses } from './entities/user-addresses.entity';
+import { ListingsModule } from 'src/listings/listings.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      OrderEntity,
-      UserAddresses,
-      StatesEntity,
-      ReviewsEntity,
-    ]),
-  ],
+  imports: [TypeOrmModule.forFeature([OrderEntity, UserAddresses, StatesEntity, ReviewsEntity]), ListingsModule],
   providers: [OrdersService],
   controllers: [OrdersController],
 })
