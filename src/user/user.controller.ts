@@ -1,20 +1,10 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Res, UseGuards } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
 import { Response } from 'express';
-import {
-  invalidInput,
-  loginResponse,
-  userExistsError,
-  userNotFound,
-} from './user.response';
+import { invalidInput, loginResponse } from './user.response';
 import * as dayjs from 'dayjs';
-import {
-  ApiBadRequestResponse,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import User from 'src/decorators/User.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
 
@@ -28,32 +18,26 @@ export class UserController {
   })
   @ApiBadRequestResponse({ description: 'Return bad response with reason' })
   @Post('/login')
-  async loginUser(
-    @Body() { email, password }: UserDto,
-    @Res() response: Response,
-  ) {
-    this.userService.getOneByEmail(email).then((user) => {
-      if (typeof user === 'undefined') {
-        return response.status(400).send(userNotFound);
-      }
+  async loginUser(@Body() { email, password }: UserDto, @Res() response: Response) {
+    try {
+      const user = await this.userService.getOneByEmail(email);
 
-      this.userService
-        .comparePassword(password, user.password)
-        .then((matches) => {
-          if (!matches) {
-            return response.status(400).send(invalidInput);
-          }
-          const jwt = this.userService.createJWT({ email, id: user.id });
+      const matched = await this.userService.comparePassword(password, user.password);
 
-          response
-            .cookie('token', JSON.stringify({ token: jwt }), {
-              httpOnly: true,
-              expires: dayjs().add(1, 'days').toDate(),
-            })
-            .status(200)
-            .send({ ...loginResponse });
-        });
-    });
+      if (!matched) return response.status(400).send(invalidInput);
+
+      const token = this.userService.createJWT({ id: user.id });
+
+      response
+        .cookie('token', JSON.stringify({ token }), {
+          httpOnly: true,
+          expires: dayjs().add(1, 'days').toDate(),
+        })
+        .status(200)
+        .send(loginResponse);
+    } catch (error) {
+      throw new NotFoundException(`Couldn't find account with ${email} email`);
+    }
   }
 
   @ApiCreatedResponse({
@@ -61,35 +45,35 @@ export class UserController {
   })
   @ApiBadRequestResponse({ description: 'Return bad response with reason' })
   @Post('/register')
-  registerUser(
-    @Body() { email, password }: UserDto,
-    @Res() response: Response,
-  ) {
-    this.userService.checkIfExists(email).then((exists) => {
-      if (exists) {
-        return response.status(400).send(userExistsError);
-      }
-      this.userService.hashPassword(password).then((hashed) => {
-        this.userService
-          .createUser({ email, password: hashed })
-          .then(({ raw }) => {
-            if (raw.affectedRows > 0) {
-              const jwt = this.userService.createJWT({
-                email,
-                id: raw.insertId,
-              });
+  async registerUser(@Body() { email, password }: UserDto, @Res() response: Response) {
+    const exists = await this.userService.checkIfExists(email);
 
-              response
-                .cookie('token', JSON.stringify({ token: jwt }), {
-                  httpOnly: true,
-                  expires: dayjs().add(1, 'days').toDate(),
-                })
-                .status(200)
-                .send({ ...loginResponse });
-            }
-          });
+    if (exists) {
+      throw new BadRequestException('User with that email already exists');
+    }
+    try {
+      const hashed = await this.userService.hashPassword(password);
+
+      const { raw } = await this.userService.createUser({
+        email,
+        password: hashed,
       });
-    });
+
+      if (raw.affectedRows > 0) {
+        const token = this.userService.createJWT({
+          id: raw.insertId,
+        });
+
+        response
+          .cookie('token', JSON.stringify({ token }), {
+            httpOnly: true,
+            expires: dayjs().add(1, 'days').toDate(),
+          })
+          .send(loginResponse);
+      }
+    } catch (error) {
+      throw new BadRequestException('Someting went wrong');
+    }
   }
 
   @Post('/cookie')
@@ -102,7 +86,6 @@ export class UserController {
         httpOnly: true,
         expires: dayjs().add(1, 'days').toDate(),
       })
-      .status(200)
       .send({
         statusCode: 200,
         message: 'cookie set',
