@@ -42,7 +42,7 @@ export class UserService {
   }
 
   getOneByEmail(email: string): Promise<UserEntity> {
-    return this.userRepository.findOne({
+    return this.userRepository.findOneOrFail({
       where: {
         email,
       },
@@ -50,7 +50,7 @@ export class UserService {
     });
   }
 
-  createJWT<T extends {}>(props: T): string {
+  createJWT<T extends { id: number }>(props: T): string {
     return jwt.sign(props, SECRET, {
       expiresIn: '2d',
     });
@@ -64,5 +64,9 @@ export class UserService {
   }
   comparePassword(password: string, encrypted: string) {
     return bcrypt.compare(password, encrypted);
+  }
+
+  getCredentials(user_id: number) {
+    return this.userRepository.findOne(user_id);
   }
 }
