@@ -7,11 +7,13 @@ import {
   Query,
   Res,
   UseFilters,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ListingsService } from '../services/listings.service';
 import { Response } from 'express';
 import { HttpErrorFilter } from 'src/filters/HttpErrorFilter';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @UseFilters(HttpErrorFilter)
 @ApiTags('listings')
@@ -27,9 +29,14 @@ export class ListingsController {
     return this.listingsService.getAll(skip);
   }
 
+  @ApiOkResponse({ description: 'Returns all prods ids' })
+  @Get('/ids')
+  getAllProductsIds() {
+    return this.listingsService.getAllIds();
+  }
+
   @ApiOkResponse({
-    description:
-      'Returns Array of objects containing listings matching query param',
+    description: 'Returns Array of objects containing listings matching query param',
   })
   @Get('/search')
   getSearched(@Query('query') query: string) {
@@ -49,6 +56,14 @@ export class ListingsController {
   @Get('/category')
   getListingsByCategory(@Query('catId', ParseIntPipe) catId: number) {
     return this.listingsService.getByCategory(catId);
+  }
+
+  @Get('/protected')
+  @UseGuards(AuthGuard)
+  protected() {
+    return {
+      protected: 'true',
+    };
   }
 
   @Get('/:id') // must be last

@@ -17,14 +17,10 @@ import { ManagmentService } from './services/managment.service';
     MulterModule.register({
       dest: './upload',
     }),
-    TypeOrmModule.forFeature([
-      ListingsImagesEntity,
-      ListingsEntity,
-      SubcategoriesEntity,
-      CategoriesEntity,
-    ]),
+    TypeOrmModule.forFeature([ListingsImagesEntity, ListingsEntity, SubcategoriesEntity, CategoriesEntity]),
   ],
   controllers: [ListingsController, ImagesController, ManagmentController],
   providers: [ListingsService, ImagesService, ManagmentService],
+  exports: [ListingsService],
 })
 export class ListingsModule {}
