@@ -24,32 +24,24 @@ export class ManagmentController {
 
   @Post()
   @UseGuards(AuthGuard)
-  async createListing(
-    @Body() props: ListingsDto,
-    @User() id: number,
-    @Res() response: Response,
-  ) {
-    this.managmentService
-      .insertListing({ ...props, seller_id: id })
-      .then((succ) => {
-        if (!succ) {
-          throw new BadRequestException();
-        }
-        response.status(201).send({
-          statusCode: 201,
-          message: 'Listing created successfully',
-        });
-      })
-      .catch(console.warn);
+  async createListing(@Body() props: ListingsDto, @User() id: number, @Res() response: Response) {
+    try {
+      const succ = await this.managmentService.insertListing({ ...props, seller_id: id });
+      if (!succ) {
+        throw new BadRequestException();
+      }
+      response.status(201).send({
+        statusCode: 201,
+        message: 'Listing created successfully',
+      });
+    } catch (error) {
+      throw new BadRequestException();
+    }
   }
 
   @Put('/archive/:listing_id')
   @UseGuards(AuthGuard)
-  async archiveListing(
-    @User() seller_id: number,
-    @Param('listing_id') listing_id: number,
-    @Res() response: Response,
-  ) {
+  async archiveListing(@User() seller_id: number, @Param('listing_id') listing_id: number, @Res() response: Response) {
     try {
       await this.managmentService.hasPermission(seller_id, listing_id);
       await this.managmentService.archivizeListing(listing_id);
@@ -72,10 +64,7 @@ export class ManagmentController {
   ) {
     try {
       await this.managmentService.hasPermission(seller_id, listing_id);
-      const { affected } = await this.managmentService.updateFieldsByKeys(
-        listing_id,
-        props,
-      );
+      const { affected } = await this.managmentService.updateFieldsByKeys(listing_id, props);
       if (affected > 0) {
         return response.send({
           statusCode: 200,
