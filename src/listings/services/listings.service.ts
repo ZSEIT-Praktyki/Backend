@@ -12,15 +12,17 @@ export class ListingsService {
 
   private relations = ['seller_id', 'images', 'subcategory_id', 'subcategory_id.category_id'];
 
-  getAll(skip = 0) {
-    return this.listingsRepo.find({
-      //prettier-ignore
-      select:["listing_id","title","price","condition","seller_id","added_date","images","subcategory_id"],
-      relations: this.relations,
-      skip: skip,
-      take: 10,
-      where: { isActive: true },
-    });
+  async getAll(skip = 0) {
+    return this.listingsRepo
+      .find({
+        //prettier-ignore
+        select:["listing_id","title","price","images"],
+        relations: ['images'],
+        skip: skip,
+        take: 10,
+        where: { isActive: true },
+      })
+      .then((res) => res.map((list) => ({ ...list, images: list.images[0] ?? null })));
   }
 
   getById(id: number) {
