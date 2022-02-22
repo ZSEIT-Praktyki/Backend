@@ -26,12 +26,14 @@ export class ManagmentController {
   @UseGuards(AuthGuard)
   async createListing(@Body() props: ListingsDto, @User() id: number, @Res() response: Response) {
     try {
-      const succ = await this.managmentService.insertListing({ ...props, seller_id: id });
-      if (!succ) {
+      const { raw } = await this.managmentService.insertListing({ ...props, seller_id: id });
+      if (raw.affected === 0 || raw.affectedRows === 0) {
         throw new BadRequestException();
       }
+
       response.status(201).send({
         statusCode: 201,
+        listing_id: raw.insertId,
         message: 'Listing created successfully',
       });
     } catch (error) {

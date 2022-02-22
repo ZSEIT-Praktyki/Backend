@@ -20,17 +20,11 @@ export class ManagmentService {
   ) {}
 
   async insertListing(props: ListingProps) {
-    return this.listingsRepo
-      .insert({
-        ...props,
-        condition:
-          props.condition === Condition.NEW ? Condition.NEW : Condition.USED,
-        isActive: true,
-      })
-      .then(({ raw }) => {
-        if (raw.affectedRows > 0) return true;
-        return false;
-      });
+    return this.listingsRepo.insert({
+      ...props,
+      condition: props.condition === Condition.NEW ? Condition.NEW : Condition.USED,
+      isActive: true,
+    });
   }
 
   async hasPermission(seller_id: number, listing_id: number) {
@@ -43,10 +37,7 @@ export class ManagmentService {
   }
 
   // refactor later
-  async updateFieldsByKeys(
-    listing_id: number,
-    { description, price, quantity, title }: UpdateParams,
-  ) {
+  async updateFieldsByKeys(listing_id: number, { description, price, quantity, title }: UpdateParams) {
     return this.listingsRepo.update(
       { listing_id },
       {

@@ -24,6 +24,7 @@ export class OrdersController {
     }
   }
 
+  // TODO: read about best practises and correct way to use it
   @Post('/webhook')
   async hanldeIncomingEvent(@Headers('stripe-signature') signature: string, @Req() request: BufferRequest) {
     if (!signature) throw new BadRequestException('Missing stripe-signature header');
@@ -31,12 +32,28 @@ export class OrdersController {
       const event = await this.ordersService.constructEventFromPayload(signature, request.rawBody);
 
       switch (event.type) {
-        case '':
-          console.log(event);
+        case 'charge.succeeded':
+          //@ts-ignore
+          const paymentIntent = event.data.object.payment_intent;
+          const res = await this.ordersService.retriveIntent(paymentIntent);
+          const { billing_details } = res.charges.data[0];
+
+          const email = billing_details.email;
+
+          console.log({ email });
+
+          // check this later https://stripe.com/docs/billing/customer
+
           break;
+
+        default:
+          console.warn(`Unhandled event type: ${event.type}`);
+          throw new BadRequestException();
       }
+
+      return {};
     } catch (error) {
-      console.warn(error);
+      throw new BadRequestException();
     }
   }
 }

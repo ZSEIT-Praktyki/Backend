@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
 
+// [TODO]: create customer and assign id
+
 @Injectable()
 export class OrdersService {
   #stripe: Stripe;
@@ -24,5 +26,16 @@ export class OrdersService {
     const webhookSecret = process.env.STRIPE_WEBHOOK_KEY;
 
     return this.#stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+  }
+
+  async createCustomer(props: any) {
+    return this.#stripe.customers.create({
+      name: props.name,
+      email: props.email,
+    });
+  }
+
+  async retriveIntent(id: string) {
+    return this.#stripe.paymentIntents.retrieve(id);
   }
 }
