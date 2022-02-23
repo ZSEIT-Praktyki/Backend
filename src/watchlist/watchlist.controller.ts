@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBody, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import User from 'src/decorators/User.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
@@ -12,8 +12,8 @@ export class WatchlistController {
   constructor(private watchlistService: WatchlistService) {}
 
   @Get()
-  getUserWatchlist(@User() id: number) {
-    return this.watchlistService.getRelatedToUser(id);
+  getUserWatchlist(@User() id: number, @Query('skip') skip: number) {
+    return this.watchlistService.getRelatedToUser(id, skip);
   }
 
   @ApiOkResponse({ description: 'Listing added to watchlist' })

@@ -41,7 +41,7 @@ export class ListingsEntity {
   @JoinColumn({ name: 'seller_id' })
   seller_id: UserEntity;
 
-  @OneToMany(() => ListingsImagesEntity, (type) => type.listing_id)
+  @OneToMany(() => ListingsImagesEntity, (type) => type.listing_id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'images' })
   images: ListingsImagesEntity[];
 

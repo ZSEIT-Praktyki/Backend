@@ -15,8 +15,7 @@ export class ListingsService {
   async getAll(skip = 0) {
     return this.listingsRepo
       .find({
-        //prettier-ignore
-        select:["listing_id","title","price","images"],
+        select: ['listing_id', 'title', 'price', 'images', 'added_date'],
         relations: ['images'],
         skip: skip,
         take: 10,
@@ -32,16 +31,20 @@ export class ListingsService {
     });
   }
 
-  getByQueryText(text: string) {
-    return this.listingsRepo.find({
-      relations: this.relations,
-      where: [
-        {
-          title: Like(`%${text}%`),
-        },
-        { description: Like(`%${text}%`) },
-      ],
-    });
+  async getByQueryText(text: string) {
+    return this.listingsRepo
+      .find({
+        select: ['title', 'listing_id', 'price', 'added_date', 'images'],
+        relations: ['images'],
+        where: [
+          {
+            title: Like(`%${text}%`),
+            isActive: true,
+          },
+          { description: Like(`%${text}%`), isActive: true },
+        ],
+      })
+      .then((res) => res.map((v) => ({ ...v, images: v.images?.[0] })));
   }
 
   getAllIds() {

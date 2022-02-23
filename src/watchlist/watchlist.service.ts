@@ -10,19 +10,27 @@ export class WatchlistService {
     private watchRepository: Repository<WatchlistEntity>,
   ) {}
 
-  getRelatedToUser(user_id: number): Promise<WatchlistEntity[]> {
-    return this.watchRepository.find({
-      where: {
-        user_id,
-      },
-      relations: [
-        'listing_id',
-        'listing_id.seller_id',
-        'listing_id.images',
-        'listing_id.subcategory_id',
-        'listing_id.subcategory_id.category_id',
-      ],
-    });
+  async getRelatedToUser(user_id: number, skip = 0) {
+    return this.watchRepository
+      .find({
+        where: {
+          user_id,
+        },
+        skip,
+        take: 10,
+
+        relations: ['listing_id', 'listing_id.images'],
+      })
+      .then((res) =>
+        res.map((w) => ({
+          watchlist_id: w.id,
+          listing_id: w.listing_id.listing_id,
+          price: w.listing_id.price,
+          images: w.listing_id.images?.[0] ?? null,
+          added_date: w.listing_id.added_date,
+          title: w.listing_id.title,
+        })),
+      );
   }
 
   async addWatchlistListing(user_id: number, listing_id: any) {
