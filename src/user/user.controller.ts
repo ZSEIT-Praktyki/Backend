@@ -1,7 +1,7 @@
 import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Res, UseGuards } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
-import { Response } from 'express';
+import { response, Response } from 'express';
 import { invalidInput, loginResponse } from './user.response';
 import * as dayjs from 'dayjs';
 import { ApiBadRequestResponse, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
@@ -95,5 +95,10 @@ export class UserController {
   @Get('/credentials')
   getUserCredentials(@User() id: number) {
     return this.userService.getCredentials(id);
+  }
+
+  @Post('/signout')
+  signout() {
+    return response.clearCookie('token').end();
   }
 }

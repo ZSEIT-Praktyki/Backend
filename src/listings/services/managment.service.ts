@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ListingsEntity } from '../entities/listings.entity';
 import type { ListingProps } from '../listings.inteface';
-import { Condition } from '../entities/listings.entity';
 
 interface UpdateParams {
   title?: string;
@@ -22,7 +21,6 @@ export class ManagmentService {
   async insertListing(props: ListingProps) {
     return this.listingsRepo.insert({
       ...props,
-      condition: props.condition === Condition.NEW ? Condition.NEW : Condition.USED,
       isActive: true,
     });
   }
@@ -51,5 +49,18 @@ export class ManagmentService {
 
   async archivizeListing(listing_id: number) {
     return this.listingsRepo.update({ listing_id }, { isActive: false });
+  }
+
+  async decrementAmmount(listing_id: number) {
+    const res = await this.listingsRepo.findOne(listing_id);
+
+    console.log(res.quantity);
+
+    if (res.quantity - 1 > 0) {
+      // sets quantity to 1
+      return this.listingsRepo.decrement({ listing_id }, 'quantity', res.quantity - 1);
+    } else {
+      return this.listingsRepo.update({ listing_id }, { isActive: false });
+    }
   }
 }

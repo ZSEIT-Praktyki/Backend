@@ -1,19 +1,11 @@
 import { UserEntity } from 'src/user/user.entity';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 import { ListingsImagesEntity } from './listings-images.entity';
 import { SubcategoriesEntity } from './subcategories.entity';
 
 export enum Condition {
-  NEW,
-  USED,
+  NEW = 'New',
+  USED = 'Used',
 }
 
 @Entity('listings')

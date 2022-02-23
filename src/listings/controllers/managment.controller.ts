@@ -37,6 +37,7 @@ export class ManagmentController {
         message: 'Listing created successfully',
       });
     } catch (error) {
+      console.warn(error);
       throw new BadRequestException();
     }
   }

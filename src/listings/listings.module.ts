@@ -21,6 +21,6 @@ import { ManagmentService } from './services/managment.service';
   ],
   controllers: [ListingsController, ImagesController, ManagmentController],
   providers: [ListingsService, ImagesService, ManagmentService],
-  exports: [ListingsService],
+  exports: [ListingsService, ManagmentService],
 })
 export class ListingsModule {}

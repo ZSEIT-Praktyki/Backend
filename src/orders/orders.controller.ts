@@ -1,20 +1,38 @@
-import { BadRequestException, Body, Controller, Headers, NotFoundException, Post, Req } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Headers,
+  NotFoundException,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import User from 'src/decorators/User.decorator';
+import { AuthGuard } from 'src/guards/auth.guard';
 import { ListingsService } from 'src/listings/services/listings.service';
+import { ManagmentService } from 'src/listings/services/managment.service';
 import { BufferRequest } from './orders.interface';
 import { OrdersService } from './orders.service';
 
 @ApiTags('orders')
 @Controller('orders')
 export class OrdersController {
-  constructor(private ordersService: OrdersService, private listingService: ListingsService) {}
+  constructor(
+    private ordersService: OrdersService,
+    private listingService: ListingsService,
+    private managmentService: ManagmentService,
+  ) {}
 
+  @UseGuards(AuthGuard)
   @Post('/create-intent')
-  async createPaymentIntent(@Body('listing_id') listing_id: number) {
+  async createPaymentIntent(@Body('listing_id') listing_id: number, @User() user_id: number) {
+    console.log('secure');
     try {
       const { price } = await this.listingService.getById(listing_id);
 
-      const paymentIntent = await this.ordersService.createPaymentIntent(price);
+      const paymentIntent = await this.ordersService.createPaymentIntent(price, { user_id, listing_id });
       return {
         statusCode: 200,
         paymentIntent,
@@ -32,23 +50,23 @@ export class OrdersController {
       const event = await this.ordersService.constructEventFromPayload(signature, request.rawBody);
 
       switch (event.type) {
-        case 'charge.succeeded':
-          //@ts-ignore
-          const paymentIntent = event.data.object.payment_intent;
-          const res = await this.ordersService.retriveIntent(paymentIntent);
-          const { billing_details } = res.charges.data[0];
+        case 'payment_intent.succeeded':
+          // @ts-ignore
+          const { listing_id, user_id, quantity } = event.data.object.charges.data[0].metadata;
 
-          const email = billing_details.email;
+          console.log(user_id);
 
-          console.log({ email });
-
-          // check this later https://stripe.com/docs/billing/customer
+          try {
+            await this.ordersService.saveOrder({ listing_id, user_id, quantity });
+            await this.managmentService.decrementAmmount(listing_id);
+          } catch (error) {
+            console.warn(error);
+          }
 
           break;
 
         default:
           console.warn(`Unhandled event type: ${event.type}`);
-          throw new BadRequestException();
       }
 
       return {};
