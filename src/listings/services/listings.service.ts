@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { ListingsEntity } from '../entities/listings.entity';
 
+const PAGE_SIZE = 15;
+
 @Injectable()
 export class ListingsService {
   constructor(
@@ -12,13 +14,13 @@ export class ListingsService {
 
   private relations = ['seller_id', 'images', 'subcategory_id', 'subcategory_id.category_id'];
 
-  async getAll(skip = 0) {
+  async getAll(page = 1) {
     return this.listingsRepo
       .find({
         select: ['listing_id', 'title', 'price', 'images', 'added_date'],
         relations: ['images'],
-        skip: skip,
-        take: 10,
+        skip: (page - 1) * PAGE_SIZE,
+        take: PAGE_SIZE,
         where: { isActive: true },
       })
       .then((res) => res.map((list) => ({ ...list, images: list.images[0] ?? null })));
@@ -31,11 +33,13 @@ export class ListingsService {
     });
   }
 
-  async getByQueryText(text: string) {
+  async getByQueryText(text: string, page = 1) {
     return this.listingsRepo
-      .find({
+      .findAndCount({
         select: ['title', 'listing_id', 'price', 'added_date', 'images'],
         relations: ['images'],
+        skip: (page - 1) * PAGE_SIZE,
+        take: PAGE_SIZE,
         where: [
           {
             title: Like(`%${text}%`),
@@ -44,7 +48,11 @@ export class ListingsService {
           { description: Like(`%${text}%`), isActive: true },
         ],
       })
-      .then((res) => res.map((v) => ({ ...v, images: v.images?.[0] })));
+      .then(([value, amount]) => ({
+        amount: Math.ceil(amount / PAGE_SIZE), // amount of pages
+        hasMore: (page - 1) * PAGE_SIZE + PAGE_SIZE < amount,
+        results: value.map((v) => ({ ...v, images: v.images?.[0] })),
+      }));
   }
 
   getAllIds() {

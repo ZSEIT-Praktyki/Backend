@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   NotFoundException,
@@ -25,8 +26,8 @@ export class ListingsController {
     description: 'Returns Array of objects containing listings',
   })
   @Get('/')
-  getAllListings(@Query('skip') skip: number) {
-    return this.listingsService.getAll(skip);
+  getAllListings(@Query('page') page: number) {
+    return this.listingsService.getAll(page);
   }
 
   @ApiOkResponse({ description: 'Returns all prods ids' })
@@ -39,8 +40,15 @@ export class ListingsController {
     description: 'Returns Array of objects containing listings matching query param',
   })
   @Get('/search')
-  getSearched(@Query('query') query: string) {
-    return this.listingsService.getByQueryText(query);
+  async getSearched(@Query('query') query: string, @Query('page') page: number) {
+    try {
+      const res = await this.listingsService.getByQueryText(query, page);
+      return res;
+    } catch (error) {
+      throw new BadRequestException({
+        error,
+      });
+    }
   }
 
   @Get('/subcategory')

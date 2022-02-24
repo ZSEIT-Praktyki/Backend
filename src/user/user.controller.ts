@@ -99,6 +99,6 @@ export class UserController {
 
   @Post('/signout')
   signout() {
-    return response.clearCookie('token').end();
+    return response.clearCookie('token', {}).end();
   }
 }
