@@ -10,6 +10,16 @@ export class WatchlistService {
     private watchRepository: Repository<WatchlistEntity>,
   ) {}
 
+  async getIfExists(user_id: number, listing_id: any) {
+    return this.watchRepository.findOne({
+      select: ['id'],
+      where: {
+        user_id,
+        listing_id,
+      },
+    });
+  }
+
   async getRelatedToUser(user_id: number, skip = 0) {
     return this.watchRepository
       .find({

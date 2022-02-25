@@ -40,11 +40,24 @@ export class ListingsController {
     description: 'Returns Array of objects containing listings matching query param',
   })
   @Get('/search')
-  async getSearched(@Query('query') query: string, @Query('page') page: number) {
+  async getSearched(
+    @Query('query') query: string,
+    @Query('page') page: number,
+    @Query('min') min: number,
+    @Query('max') max: number,
+  ) {
+    console.log({ min: +min, max: +max });
     try {
-      const res = await this.listingsService.getByQueryText(query, page);
+      const res = await this.listingsService.getByQueryText({
+        query,
+        page,
+        min: typeof min !== 'undefined' ? +min * 100 : 0,
+        max: typeof max !== 'undefined' ? +max * 100 : 9999 * 100,
+        order: 'ASC',
+      });
       return res;
     } catch (error) {
+      console.log(error);
       throw new BadRequestException({
         error,
       });

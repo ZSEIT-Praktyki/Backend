@@ -16,6 +16,14 @@ export class WatchlistController {
     return this.watchlistService.getRelatedToUser(id, skip);
   }
 
+  @Get('/check')
+  async watchlistElementCheck(@User() id: number, @Query('listing_id') listing_id: number) {
+    return this.watchlistService.getIfExists(id, listing_id).then((res) => {
+      if (typeof res === 'undefined') return { isIn: false };
+      return { isIn: true };
+    });
+  }
+
   @ApiOkResponse({ description: 'Listing added to watchlist' })
   @ApiBadRequestResponse({ description: '{Error message}' })
   @ApiBody({})

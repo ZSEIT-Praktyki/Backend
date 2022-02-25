@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository } from 'typeorm';
+import { Between, Brackets, LessThan, Like, MoreThan, Repository } from 'typeorm';
 import { ListingsEntity } from '../entities/listings.entity';
 
 const PAGE_SIZE = 15;
@@ -33,25 +33,30 @@ export class ListingsService {
     });
   }
 
-  async getByQueryText(text: string, page = 1) {
+  async getByQueryText({ query = '', page = 1, min = 0, max, order }) {
     return this.listingsRepo
       .findAndCount({
-        select: ['title', 'listing_id', 'price', 'added_date', 'images'],
-        relations: ['images'],
+        select: ['listing_id', 'price', 'added_date', 'title'],
         skip: (page - 1) * PAGE_SIZE,
         take: PAGE_SIZE,
-        where: [
-          {
-            title: Like(`%${text}%`),
-            isActive: true,
+        where: {
+          title: Like(`%${query}%`),
+          price: Between(+min, +max),
+        },
+        order: {
+          price: order,
+        },
+        join: {
+          alias: 'list',
+          leftJoinAndSelect: {
+            images: 'list.images',
           },
-          { description: Like(`%${text}%`), isActive: true },
-        ],
+        },
       })
       .then(([value, amount]) => ({
         amount: Math.ceil(amount / PAGE_SIZE), // amount of pages
         hasMore: (page - 1) * PAGE_SIZE + PAGE_SIZE < amount,
-        results: value.map((v) => ({ ...v, images: v.images?.[0] })),
+        results: value.map((v) => ({ ...v, images: v.images?.[0] ?? null })),
       }));
   }
 
