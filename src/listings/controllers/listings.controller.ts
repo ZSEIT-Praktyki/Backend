@@ -43,16 +43,16 @@ export class ListingsController {
   async getSearched(
     @Query('query') query: string,
     @Query('page') page: number,
-    @Query('min') min: number,
-    @Query('max') max: number,
+    @Query('min') min: number = 0,
+    @Query('max') max: number = 9999 * 100,
   ) {
     console.log({ min: +min, max: +max });
     try {
       const res = await this.listingsService.getByQueryText({
         query,
         page,
-        min: typeof min !== 'undefined' ? +min * 100 : 0,
-        max: typeof max !== 'undefined' ? +max * 100 : 9999 * 100,
+        min: min,
+        max: max,
         order: 'ASC',
       });
       return res;
