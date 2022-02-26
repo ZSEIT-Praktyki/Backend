@@ -56,9 +56,10 @@ export class WatchlistService {
       });
   }
 
-  async removeListingFromWatchlist(watchlist_id: number) {
+  async removeListingFromWatchlist(watchlist_id: any, user_id: number) {
     return this.watchRepository.delete({
-      id: watchlist_id,
+      listing_id: watchlist_id,
+      user_id,
     });
   }
 }

@@ -1,9 +1,10 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Query, Res, UseGuards } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBody, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import User from 'src/decorators/User.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { WatchlistDto } from './dto/dto';
 import { WatchlistService } from './watchlist.service';
+import { Response } from 'express';
 
 @ApiTags('watchlist')
 @UseGuards(AuthGuard)
@@ -45,14 +46,14 @@ export class WatchlistController {
   }
 
   @Delete('/:watchlist_id')
-  async deleteWatchlistElement(@Param('watchlist_id') id: number) {
-    return this.watchlistService.removeListingFromWatchlist(id).then(({ affected }) => {
-      if (affected > 0)
-        return {
-          statusCode: 200,
+  async deleteWatchlistElement(@Param('watchlist_id') id: number, @User() user_id: number, @Res() response: Response) {
+    return this.watchlistService.removeListingFromWatchlist(id, user_id).then((result) => {
+      if (result.affected > 0) {
+        return response.status(202).send({
+          statusCode: 202,
           message: 'Deleted',
-        };
-      throw new BadRequestException();
+        });
+      }
     });
   }
 }
