@@ -63,4 +63,29 @@ export class ManagmentService {
       return this.listingsRepo.update({ listing_id }, { isActive: false });
     }
   }
+
+  async getUserActiveListings(user_id: number) {
+    return this.listingsRepo
+      .find({
+        select: ['listing_id', 'title', 'quantity', 'added_date', 'price', 'images'],
+        relations: ['images'],
+        where: {
+          seller_id: user_id,
+          isActive: true,
+        },
+      })
+      .then((res) => res.map((list) => ({ ...list, images: list?.images[0] ?? null })));
+  }
+  async getUserNotActiveListings(user_id: number) {
+    return this.listingsRepo
+      .find({
+        select: ['listing_id', 'title', 'quantity', 'added_date', 'price', 'images'],
+        relations: ['images'],
+        where: {
+          seller_id: user_id,
+          isActive: false,
+        },
+      })
+      .then((res) => res.map((list) => ({ ...list, images: list?.images[0] ?? null })));
+  }
 }

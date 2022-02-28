@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   BadRequestException,
   ForbiddenException,
+  Get,
 } from '@nestjs/common';
 import User from '../../decorators/User.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
@@ -21,6 +22,16 @@ import { ApiTags } from '@nestjs/swagger';
 @Controller('/listings/managment')
 export class ManagmentController {
   constructor(private managmentService: ManagmentService) {}
+
+  @Get('/active')
+  getUserActive(@User() id: number) {
+    return this.managmentService.getUserActiveListings(id);
+  }
+
+  @Get('/not-active')
+  getUserNotActive(@User() id: number) {
+    return this.managmentService.getUserNotActiveListings(id);
+  }
 
   @Post()
   @UseGuards(AuthGuard)
