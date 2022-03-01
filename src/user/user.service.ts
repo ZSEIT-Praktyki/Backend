@@ -8,6 +8,14 @@ import * as bcrypt from 'bcrypt';
 
 export const SECRET = process.env.JWT_SECRET || 'development';
 
+interface CreateProps {
+  email: string;
+  password: string;
+  name: string;
+  surname: string;
+  phone: string;
+}
+
 @Injectable()
 export class UserService {
   constructor(
@@ -31,14 +39,13 @@ export class UserService {
       });
   }
 
-  createUser({
-    email,
-    password,
-  }: {
-    email: string;
-    password: string;
-  }): Promise<InsertResult> {
-    return this.userRepository.insert({ email, password });
+  createUser(props: CreateProps): Promise<InsertResult> {
+    return this.userRepository.insert({
+      ...props,
+      owners_name: props.name,
+      owners_phone: props.phone,
+      owners_surname: props.surname,
+    });
   }
 
   getOneByEmail(email: string): Promise<UserEntity> {

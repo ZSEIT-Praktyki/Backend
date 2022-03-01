@@ -1,7 +1,7 @@
 import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Res, UseGuards } from '@nestjs/common';
-import { UserDto } from './dto/user.dto';
+import { RegisterDto, UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
-import { response, Response } from 'express';
+import { Response } from 'express';
 import { invalidInput, loginResponse } from './user.response';
 import * as dayjs from 'dayjs';
 import { ApiBadRequestResponse, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
@@ -45,7 +45,7 @@ export class UserController {
   })
   @ApiBadRequestResponse({ description: 'Return bad response with reason' })
   @Post('/register')
-  async registerUser(@Body() { email, password }: UserDto, @Res() response: Response) {
+  async registerUser(@Body() { email, password, name, phone, surname }: RegisterDto, @Res() response: Response) {
     const exists = await this.userService.checkIfExists(email);
 
     if (exists) {
@@ -57,6 +57,9 @@ export class UserController {
       const { raw } = await this.userService.createUser({
         email,
         password: hashed,
+        name,
+        surname,
+        phone,
       });
 
       if (raw.affectedRows > 0) {
@@ -98,7 +101,11 @@ export class UserController {
   }
 
   @Post('/signout')
-  signout() {
-    return response.clearCookie('token', {}).end();
+  signout(@Res() response: Response) {
+    return response
+      .clearCookie('token', {
+        httpOnly: true,
+      })
+      .end();
   }
 }
