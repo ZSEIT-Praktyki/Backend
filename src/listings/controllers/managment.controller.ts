@@ -68,6 +68,21 @@ export class ManagmentController {
     }
   }
 
+  @Put('/activate/:listing_id')
+  async activateListing(@User() seller_id: number, @Param('listing_id') listing_id: number, @Res() response: Response) {
+    try {
+      await this.managmentService.hasPermission(seller_id, listing_id);
+      await this.managmentService.activateListing(listing_id);
+
+      return response.status(202).send({
+        statusCode: 202,
+        message: 'ok',
+      });
+    } catch (error) {
+      throw new BadRequestException();
+    }
+  }
+
   @Put('/:listing_id') // can only update title, desc,price,quantity, and in future images
   @UseGuards(AuthGuard)
   async updateListing(

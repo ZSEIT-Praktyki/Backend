@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Brackets, LessThan, Like, MoreThan, Repository } from 'typeorm';
+import { Between, Like, Repository } from 'typeorm';
 import { ListingsEntity } from '../entities/listings.entity';
 
 const PAGE_SIZE = 15;

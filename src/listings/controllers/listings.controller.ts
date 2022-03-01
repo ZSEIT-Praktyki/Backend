@@ -45,6 +45,7 @@ export class ListingsController {
     @Query('page') page: number,
     @Query('min') min: number = 0,
     @Query('max') max: number = 9999 * 100,
+    @Query('condition') condition: string[],
   ) {
     console.log({ min: +min, max: +max });
     try {
@@ -77,14 +78,6 @@ export class ListingsController {
   @Get('/category')
   getListingsByCategory(@Query('catId', ParseIntPipe) catId: number) {
     return this.listingsService.getByCategory(catId);
-  }
-
-  @Get('/protected')
-  @UseGuards(AuthGuard)
-  protected() {
-    return {
-      protected: 'true',
-    };
   }
 
   @Get('/:id') // must be last

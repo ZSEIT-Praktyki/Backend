@@ -88,4 +88,13 @@ export class ManagmentService {
       })
       .then((res) => res.map((list) => ({ ...list, images: list?.images[0] ?? null })));
   }
+
+  activateListing(listing_id: number) {
+    return this.listingsRepo.update(
+      {
+        listing_id,
+      },
+      { isActive: true },
+    );
+  }
 }
