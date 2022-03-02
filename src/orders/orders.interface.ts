@@ -9,3 +9,15 @@ export interface OrderProps {
   user_id: any;
   quantity: number;
 }
+
+export interface AddressProps {
+  name: string;
+  surname: string;
+  street: string;
+  street_number: string;
+  postal_code: string;
+  city: string;
+  phone: string;
+  state: string;
+  user_id: any;
+}

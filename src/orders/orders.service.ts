@@ -3,18 +3,39 @@ import { InjectRepository } from '@nestjs/typeorm';
 import Stripe from 'stripe';
 import { Repository } from 'typeorm';
 import { OrderEntity } from './entities/orders.entity';
+import { UserAddresses } from './entities/user-addresses.entity';
 import { OrderProps } from './orders.interface';
-
-// [TODO]: create customer and assign id
+import type { AddressProps } from './orders.interface';
+import { StatesEntity } from './entities/states.entity';
 
 @Injectable()
 export class OrdersService {
   #stripe: Stripe;
 
-  constructor(@InjectRepository(OrderEntity) private orderRepo: Repository<OrderEntity>) {
+  constructor(
+    @InjectRepository(OrderEntity) private orderRepo: Repository<OrderEntity>,
+    @InjectRepository(UserAddresses) private addressesRepo: Repository<UserAddresses>,
+    @InjectRepository(StatesEntity) private statesRepo: Repository<StatesEntity>,
+  ) {
     this.#stripe = new Stripe(process.env.STRIPE_KEY, {
       typescript: true,
       apiVersion: '2020-08-27',
+    });
+  }
+
+  setUserAddress(addresses: AddressProps) {
+    return this.addressesRepo.insert(addresses);
+  }
+
+  getStates() {
+    return this.statesRepo.find();
+  }
+
+  getRelatedAddresses(user_id: number) {
+    return this.addressesRepo.find({
+      where: {
+        user_id,
+      },
     });
   }
 
