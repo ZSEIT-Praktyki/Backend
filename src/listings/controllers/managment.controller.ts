@@ -33,6 +33,11 @@ export class ManagmentController {
     return this.managmentService.getUserNotActiveListings(id);
   }
 
+  @Get('/:listing_id')
+  getSingle(@Param('listing_id') listing_id: number) {
+    return this.managmentService.getOne(listing_id);
+  }
+
   @Post()
   @UseGuards(AuthGuard)
   async createListing(@Body() props: ListingsDto, @User() id: number, @Res() response: Response) {

@@ -8,13 +8,11 @@ import {
   Query,
   Res,
   UseFilters,
-  UseGuards,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ListingsService } from '../services/listings.service';
 import { Response } from 'express';
 import { HttpErrorFilter } from 'src/filters/HttpErrorFilter';
-import { AuthGuard } from 'src/guards/auth.guard';
 
 @UseFilters(HttpErrorFilter)
 @ApiTags('listings')
@@ -46,8 +44,8 @@ export class ListingsController {
     @Query('min') min: number = 0,
     @Query('max') max: number = 9999 * 100,
     @Query('condition') condition: string[],
+    @Query('subcategory_id') subcategory_id: number,
   ) {
-    console.log({ min: +min, max: +max });
     try {
       const res = await this.listingsService.getByQueryText({
         query,
@@ -55,6 +53,7 @@ export class ListingsController {
         min: min,
         max: max,
         order: 'ASC',
+        subcategory_id,
       });
       return res;
     } catch (error) {
@@ -78,6 +77,11 @@ export class ListingsController {
   @Get('/category')
   getListingsByCategory(@Query('catId', ParseIntPipe) catId: number) {
     return this.listingsService.getByCategory(catId);
+  }
+
+  @Get('/subcategories')
+  getSubcategories() {
+    return this.listingsService.subcategories();
   }
 
   @Get('/:id') // must be last

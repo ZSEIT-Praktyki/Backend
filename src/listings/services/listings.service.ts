@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Like, Repository } from 'typeorm';
 import { ListingsEntity } from '../entities/listings.entity';
+import { SubcategoriesEntity } from '../entities/subcategories.entity';
 
 const PAGE_SIZE = 15;
 
@@ -10,6 +11,7 @@ export class ListingsService {
   constructor(
     @InjectRepository(ListingsEntity)
     private listingsRepo: Repository<ListingsEntity>,
+    @InjectRepository(SubcategoriesEntity) private subcatRepo: Repository<SubcategoriesEntity>,
   ) {}
 
   private relations = ['seller_id', 'images', 'subcategory_id', 'subcategory_id.category_id'];
@@ -33,7 +35,7 @@ export class ListingsService {
     });
   }
 
-  async getByQueryText({ query = '', page = 1, min = 0, max, order }) {
+  async getByQueryText({ query = '', page = 1, min = 0, max, order, subcategory_id }) {
     return this.listingsRepo
       .findAndCount({
         select: ['listing_id', 'price', 'added_date', 'title'],
@@ -42,6 +44,8 @@ export class ListingsService {
         where: {
           title: Like(`%${query}%`),
           price: Between(+min, +max),
+          isActive: true,
+          ...(subcategory_id && { subcategory_id }),
         },
         order: {
           price: order,
@@ -63,6 +67,9 @@ export class ListingsService {
   getAllIds() {
     return this.listingsRepo.find({
       select: ['listing_id'],
+      where: {
+        isActive: true,
+      },
     });
   }
 
@@ -94,6 +101,12 @@ export class ListingsService {
     return this.listingsRepo.find({
       where: { seller_id },
       relations: this.relations,
+    });
+  }
+
+  subcategories() {
+    return this.subcatRepo.find({
+      select: ['subcategory_id'],
     });
   }
 }

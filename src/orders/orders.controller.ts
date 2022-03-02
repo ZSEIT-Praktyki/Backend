@@ -42,7 +42,6 @@ export class OrdersController {
     }
   }
 
-  // TODO: read about best practises and correct way to use it
   @Post('/webhook')
   async hanldeIncomingEvent(@Headers('stripe-signature') signature: string, @Req() request: BufferRequest) {
     if (!signature) throw new BadRequestException('Missing stripe-signature header');
@@ -53,8 +52,6 @@ export class OrdersController {
         case 'payment_intent.succeeded':
           // @ts-ignore
           const { listing_id, user_id, quantity } = event.data.object.charges.data[0].metadata;
-
-          console.log(user_id);
 
           try {
             await this.ordersService.saveOrder({ listing_id, user_id, quantity });

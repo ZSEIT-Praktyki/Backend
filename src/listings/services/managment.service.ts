@@ -34,6 +34,10 @@ export class ManagmentService {
     });
   }
 
+  getOne(id: number) {
+    return this.listingsRepo.findOne({ listing_id: id });
+  }
+
   // refactor later
   async updateFieldsByKeys(listing_id: number, { description, price, quantity, title }: UpdateParams) {
     return this.listingsRepo.update(
@@ -54,10 +58,7 @@ export class ManagmentService {
   async decrementAmmount(listing_id: number) {
     const res = await this.listingsRepo.findOne(listing_id);
 
-    console.log(res.quantity);
-
     if (res.quantity - 1 > 0) {
-      // sets quantity to 1
       return this.listingsRepo.decrement({ listing_id }, 'quantity', res.quantity - 1);
     } else {
       return this.listingsRepo.update({ listing_id }, { isActive: false });
