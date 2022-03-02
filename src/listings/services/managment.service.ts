@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ListingsEntity } from '../entities/listings.entity';
+import { Condition, ListingsEntity } from '../entities/listings.entity';
 import type { ListingProps } from '../listings.inteface';
 
 interface UpdateParams {
@@ -10,6 +10,12 @@ interface UpdateParams {
   price?: number;
   quantity?: number;
 }
+
+const conditions = {
+  Well: Condition.WELL,
+  New: Condition.NEW,
+  Used: Condition.USED,
+};
 
 @Injectable()
 export class ManagmentService {
@@ -22,6 +28,7 @@ export class ManagmentService {
     return this.listingsRepo.insert({
       ...props,
       isActive: true,
+      condition: conditions[props.condition],
     });
   }
 

@@ -88,7 +88,7 @@ export class ManagmentController {
     }
   }
 
-  @Put('/:listing_id') // can only update title, desc,price,quantity, and in future images
+  @Put('/:listing_id')
   @UseGuards(AuthGuard)
   async updateListing(
     @Param('listing_id', ParseIntPipe) listing_id: number,

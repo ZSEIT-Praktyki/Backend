@@ -10,7 +10,6 @@ async function bootstrap() {
   app.enableCors({ origin: 'http://localhost:3000', credentials: true });
   app.use(cookieParser('secret'));
   app.useGlobalPipes(new ValidationPipe());
-
   app.use(rawOrdersMiddleware());
 
   swaggerSetup(app);

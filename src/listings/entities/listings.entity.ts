@@ -6,6 +6,7 @@ import { SubcategoriesEntity } from './subcategories.entity';
 export enum Condition {
   NEW = 'New',
   USED = 'Used',
+  WELL = 'Well',
 }
 
 @Entity('listings')
