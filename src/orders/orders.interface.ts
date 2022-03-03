@@ -8,6 +8,7 @@ export interface OrderProps {
   listing_id: any; // typeorm complains
   user_id: any;
   quantity: number;
+  address_id: number;
 }
 
 export interface AddressProps {

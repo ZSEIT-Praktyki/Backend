@@ -32,17 +32,22 @@ export class OrdersService {
       .createQueryBuilder('ord')
       .leftJoinAndSelect('ord.listing_id', 'list')
       .leftJoinAndSelect('list.images', 'img')
+      .leftJoinAndSelect('ord.address_id', 'addr')
       .where('list.seller_id = :seller_id', { seller_id })
       .getMany()
       .then((r) =>
         r.map((p) => ({
           order_id: p.order_id,
           purchased_at: p.purchased_at,
-          listing_id: p.listing_id.listing_id,
-          added_date: p.listing_id.added_date,
-          title: p.listing_id.title,
-          price: p.listing_id.price,
-          images: p.listing_id?.images[0] ?? null,
+          listing: {
+            images: p.listing_id?.images[0] ?? null,
+            title: p.listing_id.title,
+            quantity: p.listing_id.quantity,
+            price: p.listing_id.price,
+          },
+          buyer_address: {
+            ...p.address_id,
+          },
         })),
       );
   }
@@ -115,7 +120,12 @@ export class OrdersService {
     return this.#stripe.paymentIntents.retrieve(id);
   }
 
-  async saveOrder({ quantity, listing_id, user_id }: OrderProps) {
-    return this.orderRepo.insert({ quantity: +quantity, listing_id: listing_id, buyer_id: user_id });
+  async saveOrder({ quantity, listing_id, user_id, address_id }: OrderProps) {
+    return this.orderRepo.insert({
+      quantity: +quantity,
+      address_id: +address_id as any,
+      listing_id: listing_id,
+      buyer_id: user_id,
+    });
   }
 }

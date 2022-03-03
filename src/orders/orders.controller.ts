@@ -99,10 +99,10 @@ export class OrdersController {
       switch (event.type) {
         case 'payment_intent.succeeded':
           // @ts-ignore
-          const { listing_id, user_id, quantity } = event.data.object.charges.data[0].metadata;
+          const { listing_id, user_id, quantity, address_id } = event.data.object.charges.data[0].metadata;
 
           try {
-            await this.ordersService.saveOrder({ listing_id, user_id, quantity });
+            await this.ordersService.saveOrder({ address_id, listing_id, user_id, quantity });
             await this.managmentService.decrementAmmount(listing_id);
             const { price, seller_id } = await this.managmentService.getListingCredentials(listing_id);
             await this.userService.addIncome(seller_id as any, price);
