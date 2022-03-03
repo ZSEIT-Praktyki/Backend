@@ -27,8 +27,50 @@ export class OrdersService {
     return this.addressesRepo.insert(addresses);
   }
 
+  async getSaledProducts(seller_id: number) {
+    return this.orderRepo
+      .createQueryBuilder('ord')
+      .leftJoinAndSelect('ord.listing_id', 'list')
+      .leftJoinAndSelect('list.images', 'img')
+      .where('list.seller_id = :seller_id', { seller_id })
+      .getMany()
+      .then((r) =>
+        r.map((p) => ({
+          order_id: p.order_id,
+          purchased_at: p.purchased_at,
+          listing_id: p.listing_id.listing_id,
+          added_date: p.listing_id.added_date,
+          title: p.listing_id.title,
+          price: p.listing_id.price,
+          images: p.listing_id?.images[0] ?? null,
+        })),
+      );
+  }
+
+  async getPurchaseHistory(user_id: number) {
+    return this.orderRepo
+      .find({
+        select: ['order_id', 'purchased_at'],
+        where: {
+          buyer_id: user_id,
+        },
+        relations: ['listing_id', 'listing_id.images'],
+      })
+      .then((r) =>
+        r.map((p) => ({
+          order_id: p.order_id,
+          purchased_at: p.purchased_at,
+          listing_id: p.listing_id.listing_id,
+          added_date: p.listing_id.added_date,
+          title: p.listing_id.title,
+          price: p.listing_id.price,
+          images: p.listing_id?.images[0] ?? null,
+        })),
+      );
+  }
+
   getStates() {
-    return this.statesRepo.find();
+    return this.statesRepo.find({ cache: { id: 5, milliseconds: 1000 * 60 * 60 } });
   }
 
   getRelatedAddresses(user_id: number) {
@@ -39,7 +81,10 @@ export class OrdersService {
     });
   }
 
-  createPaymentIntent(price: number, { user_id, listing_id }: { user_id: number; listing_id: number }) {
+  createPaymentIntent(
+    price: number,
+    { user_id, listing_id, address_id }: { user_id: number; listing_id: number; address_id: number },
+  ) {
     return this.#stripe.paymentIntents.create({
       currency: 'eur',
       payment_method_types: ['p24', 'card'],
@@ -47,6 +92,7 @@ export class OrdersService {
       metadata: {
         user_id: +user_id,
         listing_id: +listing_id,
+        address_id: +address_id,
         quantity: 1, // make dynamic later
       },
     });

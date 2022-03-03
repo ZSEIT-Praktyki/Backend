@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Like, Repository } from 'typeorm';
+import { Between, In, Like, Repository } from 'typeorm';
 import { ListingsEntity } from '../entities/listings.entity';
 import { SubcategoriesEntity } from '../entities/subcategories.entity';
 
@@ -35,7 +35,7 @@ export class ListingsService {
     });
   }
 
-  async getByQueryText({ query = '', page = 1, min = 0, max, order, subcategory_id }) {
+  async getByQueryText({ query = '', page = 1, min = 0, max, order, subcategory_id, city }) {
     return this.listingsRepo
       .findAndCount({
         select: ['listing_id', 'price', 'added_date', 'title'],
@@ -45,6 +45,7 @@ export class ListingsService {
           title: Like(`%${query}%`),
           price: Between(+min, +max),
           isActive: true,
+          ...(city && { city }),
           ...(subcategory_id && { subcategory_id }),
         },
         order: {

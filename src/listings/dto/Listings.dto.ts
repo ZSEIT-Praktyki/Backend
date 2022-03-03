@@ -25,4 +25,7 @@ export class ListingsDto {
   @IsNotEmpty()
   @IsNumber()
   subcategory_id: number;
+
+  @IsString()
+  city: string;
 }

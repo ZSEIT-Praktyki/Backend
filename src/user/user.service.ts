@@ -76,4 +76,9 @@ export class UserService {
   getCredentials(user_id: number) {
     return this.userRepository.findOne(user_id);
   }
+
+  async addIncome(user_id: number, increment: number) {
+    const { income } = await this.userRepository.findOne({ where: { id: user_id }, select: ['income'] });
+    return this.userRepository.increment({ id: user_id }, 'income', income + increment);
+  }
 }

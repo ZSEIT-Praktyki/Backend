@@ -105,4 +105,8 @@ export class ManagmentService {
       { isActive: true },
     );
   }
+
+  getListingCredentials(listing_id: number) {
+    return this.listingsRepo.findOne({ where: { listing_id }, select: ['price', 'seller_id'] });
+  }
 }

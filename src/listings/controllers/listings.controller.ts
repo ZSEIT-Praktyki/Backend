@@ -43,8 +43,9 @@ export class ListingsController {
     @Query('page') page: number,
     @Query('min') min: number = 0,
     @Query('max') max: number = 9999 * 100,
-    @Query('condition') condition: string[],
     @Query('subcategory_id') subcategory_id: number,
+    @Query('sort') sort: string,
+    @Query('city') city: string,
   ) {
     try {
       const res = await this.listingsService.getByQueryText({
@@ -52,8 +53,9 @@ export class ListingsController {
         page,
         min: min,
         max: max,
-        order: 'ASC',
+        order: sort,
         subcategory_id,
+        city,
       });
       return res;
     } catch (error) {

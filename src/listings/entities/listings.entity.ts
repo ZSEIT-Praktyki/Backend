@@ -38,6 +38,9 @@ export class ListingsEntity {
   @Column({ type: 'bool' })
   isActive: boolean;
 
+  @Column({ type: 'varchar' })
+  city: string;
+
   @ManyToOne(() => UserEntity, (type) => type.id)
   @JoinColumn({ name: 'seller_id' })
   seller_id: UserEntity;

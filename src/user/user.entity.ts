@@ -1,9 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('users')
 export class UserEntity {
@@ -30,4 +25,7 @@ export class UserEntity {
 
   @Column({ type: 'char', length: '12', nullable: true })
   owners_phone: string;
+
+  @Column({ type: 'bigint', select: false, default: 0 })
+  income: number;
 }
