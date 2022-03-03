@@ -1,9 +1,10 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsPositive, IsString, Length } from 'class-validator';
 import { Condition } from '../entities/listings.entity';
 
 export class ListingsDto {
   @IsString()
   @IsNotEmpty()
+  @Length(5, 60)
   title: string;
 
   @IsString()
@@ -16,8 +17,10 @@ export class ListingsDto {
 
   @IsNumber()
   @IsNotEmpty()
+  @IsPositive()
   price: number;
 
+  @IsPositive()
   @IsNumber()
   @IsNotEmpty()
   quantity: number;
@@ -26,6 +29,7 @@ export class ListingsDto {
   @IsNumber()
   subcategory_id: number;
 
+  @IsNotEmpty()
   @IsString()
   city: string;
 }
