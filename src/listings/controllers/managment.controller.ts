@@ -82,6 +82,7 @@ export class ManagmentController {
       return response.status(202).send({
         statusCode: 202,
         message: 'ok',
+        listing_id,
       });
     } catch (error) {
       throw new BadRequestException();
@@ -103,6 +104,7 @@ export class ManagmentController {
         return response.send({
           statusCode: 200,
           message: 'updated',
+          listing_id,
         });
       }
       throw new BadRequestException();

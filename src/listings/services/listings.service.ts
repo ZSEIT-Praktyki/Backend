@@ -16,6 +16,16 @@ export class ListingsService {
 
   private relations = ['seller_id', 'images', 'subcategory_id', 'subcategory_id.category_id'];
 
+  getPreview(listing_id: number) {
+    return this.listingsRepo.findOne({
+      where: {
+        listing_id,
+      },
+      relations: ['images'],
+      select: ['images', 'listing_id', 'price', 'title'],
+    });
+  }
+
   async getAll(page = 1) {
     return this.listingsRepo
       .find({

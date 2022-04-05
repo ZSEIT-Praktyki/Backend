@@ -59,19 +59,23 @@ export class OrdersService {
         where: {
           buyer_id: user_id,
         },
+        order: {
+          purchased_at: 'DESC',
+        },
         relations: ['listing_id', 'listing_id.images'],
       })
-      .then((r) =>
-        r.map((p) => ({
-          order_id: p.order_id,
-          purchased_at: p.purchased_at,
-          listing_id: p.listing_id.listing_id,
-          added_date: p.listing_id.added_date,
-          title: p.listing_id.title,
-          price: p.listing_id.price,
-          images: p.listing_id?.images[0] ?? null,
-        })),
-      );
+      .then((result) => {
+        return result.map((order) => ({
+          order_id: order.order_id,
+          purchased_at: order.purchased_at,
+          listing: {
+            title: order.listing_id.title,
+            image: order.listing_id.images[0] || null,
+            listing_id: order.listing_id.listing_id,
+            price: order.listing_id.price,
+          },
+        }));
+      });
   }
 
   getStates() {

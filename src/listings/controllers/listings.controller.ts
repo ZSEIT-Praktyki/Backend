@@ -86,6 +86,11 @@ export class ListingsController {
     return this.listingsService.subcategories();
   }
 
+  @Get('/preview/:id')
+  getPreview(@Param('id') id: number) {
+    return this.listingsService.getPreview(id);
+  }
+
   @Get('/:id') // must be last
   async getListingById(@Param('id') id: number, @Res() response: Response) {
     try {

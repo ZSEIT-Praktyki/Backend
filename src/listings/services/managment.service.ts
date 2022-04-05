@@ -42,7 +42,7 @@ export class ManagmentService {
   }
 
   getOne(id: number) {
-    return this.listingsRepo.findOne({ listing_id: id });
+    return this.listingsRepo.findOne({ where: { listing_id: id }, relations: ['images'] });
   }
 
   // refactor later
