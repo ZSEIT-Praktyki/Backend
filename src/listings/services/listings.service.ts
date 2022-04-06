@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, In, Like, Repository } from 'typeorm';
+import { Between, Like, Repository } from 'typeorm';
 import { ListingsEntity } from '../entities/listings.entity';
 import { SubcategoriesEntity } from '../entities/subcategories.entity';
 
-const PAGE_SIZE = 15;
+const PAGE_SIZE = 12;
 
 @Injectable()
 export class ListingsService {
