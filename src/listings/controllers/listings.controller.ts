@@ -94,7 +94,7 @@ export class ListingsController {
   @Get('/:id') // must be last
   async getListingById(@Param('id') id: number, @Res() response: Response) {
     try {
-      const res = await this.listingsService.getById(id);
+      const res = await this.listingsService.getListingById(id);
       return response.send(res);
     } catch (error) {
       throw new NotFoundException();

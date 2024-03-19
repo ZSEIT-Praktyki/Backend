@@ -8,17 +8,16 @@ export class AppMiddleware implements NestMiddleware {
   use(req: any, _: Response, next: NextFunction) {
     const token = req.cookies['token'];
 
+    console.log('token', token);
+
     if (typeof token !== 'undefined') {
-      this.usersService.verifyJWT<{ email: string; id: number }>(
-        JSON.parse(token).token,
-        (err, decoded) => {
-          if (err) {
-          }
-          if (decoded) {
-            req.user_id = decoded.id;
-          }
-        },
-      );
+      this.usersService.verifyJWT<{ email: string; id: number }>(JSON.parse(token).token, (err, decoded) => {
+        if (err) {
+        }
+        if (decoded) {
+          req.user_id = decoded.id;
+        }
+      });
     }
 
     next();

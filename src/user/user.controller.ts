@@ -32,6 +32,8 @@ export class UserController {
         .cookie('token', JSON.stringify({ token }), {
           httpOnly: true,
           expires: dayjs().add(1, 'days').toDate(),
+          path: '/',
+          sameSite: 'strict',
         })
         .status(200)
         .send(loginResponse);
@@ -71,6 +73,8 @@ export class UserController {
           .cookie('token', JSON.stringify({ token }), {
             httpOnly: true,
             expires: dayjs().add(1, 'days').toDate(),
+            path: '/',
+            sameSite: 'strict',
           })
           .send(loginResponse);
       }
@@ -88,6 +92,8 @@ export class UserController {
       .cookie('token', JSON.stringify({ token }), {
         httpOnly: true,
         expires: dayjs().add(1, 'days').toDate(),
+        path: '/',
+        sameSite: 'strict',
       })
       .send({
         statusCode: 200,

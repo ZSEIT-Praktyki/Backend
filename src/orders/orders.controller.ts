@@ -81,6 +81,7 @@ export class OrdersController {
       const { price } = await this.listingService.getById(listing_id);
 
       const paymentIntent = await this.ordersService.createPaymentIntent(price, { user_id, listing_id, address_id });
+
       return {
         statusCode: 200,
         paymentIntent,

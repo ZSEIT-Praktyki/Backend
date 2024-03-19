@@ -22,14 +22,14 @@ export class ListingsService {
         listing_id,
       },
       relations: ['images'],
-      select: ['images', 'listing_id', 'price', 'title'],
+      select: ['listing_id', 'title', 'price', 'images', 'added_date', 'city'],
     });
   }
 
   async getAll(page = 1) {
     return this.listingsRepo
       .find({
-        select: ['listing_id', 'title', 'price', 'images', 'added_date'],
+        select: ['listing_id', 'title', 'price', 'images', 'added_date', 'city'],
         relations: ['images'],
         skip: (page - 1) * PAGE_SIZE,
         take: PAGE_SIZE,
@@ -45,17 +45,24 @@ export class ListingsService {
     });
   }
 
+  getListingById(id: number) {
+    return this.listingsRepo.findOneOrFail({
+      relations: this.relations,
+      where: { listing_id: id }, // the same as fun above but without isActive so that it can be viewed by the buyyer
+    });
+  }
+
   async getByQueryText({ query = '', page = 1, min = 0, max, order, subcategory_id, city }) {
     return this.listingsRepo
       .findAndCount({
-        select: ['listing_id', 'price', 'added_date', 'title'],
+        select: ['listing_id', 'title', 'price', 'images', 'added_date', 'city'],
         skip: (page - 1) * PAGE_SIZE,
         take: PAGE_SIZE,
         where: {
           title: Like(`%${query}%`),
           price: Between(+min, +max),
           isActive: true,
-          ...(city && { city }),
+          ...(city && { city: Like(`%${city}%`) }),
           ...(subcategory_id && { subcategory_id }),
         },
         order: {
