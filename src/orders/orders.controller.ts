@@ -8,6 +8,8 @@ import {
   Get,
   Req,
   UseGuards,
+  Res,
+  Param,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import User from 'src/decorators/User.decorator';
@@ -18,6 +20,7 @@ import { UserService } from 'src/user/user.service';
 import { AddressDto } from './dto/orders.dto';
 import { BufferRequest } from './orders.interface';
 import { OrdersService } from './orders.service';
+import { Response } from 'express';
 
 @ApiTags('orders')
 @Controller('orders')
@@ -70,6 +73,12 @@ export class OrdersController {
     return this.ordersService.getSaledProducts(id);
   }
 
+  @Get('/order/:orderId')
+  @UseGuards(AuthGuard)
+  getOrderDetails(@User() id: number, @Param('orderId') orderId: number) {
+    return this.ordersService.getOrderById(orderId);
+  }
+
   @UseGuards(AuthGuard)
   @Post('/create-intent')
   async createPaymentIntent(
@@ -80,11 +89,24 @@ export class OrdersController {
     try {
       const { price } = await this.listingService.getById(listing_id);
 
-      const paymentIntent = await this.ordersService.createPaymentIntent(price, { user_id, listing_id, address_id });
+      const order = await this.ordersService.createOrder({
+        address_id: +address_id,
+        listing_id: +listing_id,
+        buyer_id: +user_id,
+        payment_intent_id: '',
+        quantity: 1,
+        total: price,
+      });
+
+      if (order.raw.affectedRows === 0) throw new BadRequestException('Order not created');
+
+      const orderId = order.generatedMaps[0].order_id;
+      const paymentIntent = await this.ordersService.createPaymentIntent(price, orderId);
 
       return {
         statusCode: 200,
-        paymentIntent,
+        paymentIntent: paymentIntent.client_secret,
+        orderId,
       };
     } catch (error) {
       throw new NotFoundException(`Product with id: ${listing_id} doesnt exist`);
@@ -92,21 +114,36 @@ export class OrdersController {
   }
 
   @Post('/webhook')
-  async hanldeIncomingEvent(@Headers('stripe-signature') signature: string, @Req() request: BufferRequest) {
+  async hanldeIncomingEvent(
+    @Headers('stripe-signature') signature: string,
+    @Req() request: BufferRequest,
+    @Res() res: Response,
+  ) {
     if (!signature) throw new BadRequestException('Missing stripe-signature header');
+
     try {
       const event = await this.ordersService.constructEventFromPayload(signature, request.rawBody);
 
       switch (event.type) {
         case 'payment_intent.succeeded':
           // @ts-ignore
-          const { listing_id, user_id, quantity, address_id } = event.data.object.charges.data[0].metadata;
+          const { orderId } = event.data.object.charges.data[0].metadata;
+
+          const order = await this.ordersService.getOrderById(+orderId);
 
           try {
-            await this.ordersService.saveOrder({ address_id, listing_id, user_id, quantity });
-            await this.managmentService.decrementAmmount(listing_id);
-            const { price, seller_id } = await this.managmentService.getListingCredentials(listing_id);
+            await this.ordersService.completeOrder(+orderId, {
+              status: 1,
+              payment_intent_id: (event.data.object as any).id,
+            });
+
+            const listingId = order.listing_id.listing_id;
+
+            await this.managmentService.decrementAmmount(listingId as any);
+            const { price, seller_id } = await this.managmentService.getListingCredentials(listingId as any);
             await this.userService.addIncome(seller_id as any, price);
+
+            res.status(200).send('ok');
           } catch (error) {
             console.warn(error);
           }

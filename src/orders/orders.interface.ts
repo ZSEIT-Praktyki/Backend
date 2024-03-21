@@ -8,7 +8,19 @@ export interface OrderProps {
   listing_id: any; // typeorm complains
   user_id: any;
   quantity: number;
-  address_id: number;
+  address_id: any;
+
+  //  payment_intent_id: string;
+}
+
+export interface ICreateOrder {
+  listing_id: any;
+  quantity: number;
+  address_id: any;
+  payment_intent_id: string;
+
+  total: number;
+  buyer_id: any;
 }
 
 export interface AddressProps {

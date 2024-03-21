@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { OrderEntity } from './entities/orders.entity';
 import { UserAddresses } from './entities/user-addresses.entity';
 import { OrderProps } from './orders.interface';
-import type { AddressProps } from './orders.interface';
+import type { AddressProps, ICreateOrder } from './orders.interface';
 import { StatesEntity } from './entities/states.entity';
 
 @Injectable()
@@ -34,6 +34,7 @@ export class OrdersService {
       .leftJoinAndSelect('list.images', 'img')
       .leftJoinAndSelect('ord.address_id', 'addr')
       .where('list.seller_id = :seller_id', { seller_id })
+      .where('ord.is_paid = :is_paid', { is_paid: true })
       .getMany()
       .then((r) =>
         r.map((p) => ({
@@ -58,6 +59,8 @@ export class OrdersService {
         select: ['order_id', 'purchased_at'],
         where: {
           buyer_id: user_id,
+          is_paid: true,
+          payment_status: 1,
         },
         order: {
           purchased_at: 'DESC',
@@ -90,19 +93,13 @@ export class OrdersService {
     });
   }
 
-  createPaymentIntent(
-    price: number,
-    { user_id, listing_id, address_id }: { user_id: number; listing_id: number; address_id: number },
-  ) {
+  createPaymentIntent(price: number, orderId: number) {
     return this.#stripe.paymentIntents.create({
       currency: 'eur',
       payment_method_types: ['p24', 'card'],
       amount: price,
       metadata: {
-        user_id: +user_id,
-        listing_id: +listing_id,
-        address_id: +address_id,
-        quantity: 1, // make dynamic later
+        orderId: orderId,
       },
     });
   }
@@ -124,12 +121,27 @@ export class OrdersService {
     return this.#stripe.paymentIntents.retrieve(id);
   }
 
-  async saveOrder({ quantity, listing_id, user_id, address_id }: OrderProps) {
+  async createOrder(order: ICreateOrder) {
     return this.orderRepo.insert({
-      quantity: +quantity,
-      address_id: +address_id as any,
-      listing_id: listing_id,
-      buyer_id: user_id,
+      ...order,
+      is_paid: false,
+      order_status: 0,
+      payment_status: 0,
+    });
+  }
+
+  async getOrderById(order_id: number) {
+    return this.orderRepo.findOne(order_id, {
+      relations: ['listing_id', 'address_id'],
+    });
+  }
+
+  async completeOrder(order_id: number, props: { status: number; payment_intent_id: string }) {
+    return this.orderRepo.update(order_id, {
+      order_status: props.status,
+      payment_intent_id: props.payment_intent_id,
+      is_paid: true,
+      payment_status: 1,
     });
   }
 }

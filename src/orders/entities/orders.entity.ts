@@ -25,4 +25,19 @@ export class OrderEntity {
 
   @CreateDateColumn({ insert: true })
   purchased_at: Date;
+
+  @Column({ type: 'int', nullable: false })
+  total: number;
+
+  @Column({ type: 'int', nullable: false })
+  order_status: number;
+
+  @Column({ type: 'int', nullable: false })
+  payment_status: number;
+
+  @Column({ type: 'varchar', nullable: false })
+  payment_intent_id: string;
+
+  @Column({ type: 'boolean', nullable: false })
+  is_paid: boolean;
 }
