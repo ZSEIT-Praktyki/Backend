@@ -1,4 +1,14 @@
-import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Res, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  NotFoundException,
+  Post,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { RegisterDto, UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
 import { Response } from 'express';
@@ -22,20 +32,26 @@ export class UserController {
     try {
       const user = await this.userService.getOneByEmail(email);
 
+      if (!user)
+        return response.status(HttpStatus.BAD_REQUEST).send({
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'User with that email does not exist',
+        });
+
       const matched = await this.userService.comparePassword(password, user.password);
 
-      if (!matched) return response.status(400).send(invalidInput);
+      if (!matched) return response.status(HttpStatus.BAD_REQUEST).send(invalidInput);
 
       const token = this.userService.createJWT({ id: user.id });
 
       response
         .cookie('token', JSON.stringify({ token }), {
           httpOnly: true,
-          expires: dayjs().add(1, 'days').toDate(),
+          expires: dayjs().add(3, 'days').toDate(),
           path: '/',
           sameSite: 'strict',
         })
-        .status(200)
+        .status(HttpStatus.OK)
         .send(loginResponse);
     } catch (error) {
       throw new NotFoundException(`Couldn't find account with ${email} email`);
@@ -64,20 +80,25 @@ export class UserController {
         phone,
       });
 
-      if (raw.affectedRows > 0) {
-        const token = this.userService.createJWT({
-          id: raw.insertId,
+      if (raw.affectedRows <= 0)
+        return response.status(HttpStatus.BAD_REQUEST).send({
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'Something went wrong',
         });
 
-        response
-          .cookie('token', JSON.stringify({ token }), {
-            httpOnly: true,
-            expires: dayjs().add(1, 'days').toDate(),
-            path: '/',
-            sameSite: 'strict',
-          })
-          .send(loginResponse);
-      }
+      const token = this.userService.createJWT({
+        id: raw.insertId,
+      });
+
+      response
+        .cookie('token', JSON.stringify({ token }), {
+          httpOnly: true,
+          expires: dayjs().add(3, 'days').toDate(),
+          path: '/',
+          sameSite: 'strict',
+        })
+        .status(HttpStatus.CREATED)
+        .send(loginResponse);
     } catch (error) {
       throw new BadRequestException('Someting went wrong');
     }
@@ -91,12 +112,12 @@ export class UserController {
     response
       .cookie('token', JSON.stringify({ token }), {
         httpOnly: true,
-        expires: dayjs().add(1, 'days').toDate(),
+        expires: dayjs().add(3, 'days').toDate(),
         path: '/',
         sameSite: 'strict',
       })
       .send({
-        statusCode: 200,
+        statusCode: HttpStatus.OK,
         message: 'cookie set',
       });
   }

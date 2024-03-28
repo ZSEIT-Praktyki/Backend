@@ -78,7 +78,6 @@ export class UserService {
   }
 
   async addIncome(user_id: number, increment: number) {
-    const { income } = await this.userRepository.createQueryBuilder('u').select('u.income').getOne();
-    return this.userRepository.increment({ id: user_id }, 'income', income + increment);
+    return this.userRepository.update({ id: user_id }, { income: () => `income + ${increment}` });
   }
 }

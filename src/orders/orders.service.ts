@@ -144,4 +144,13 @@ export class OrdersService {
       payment_status: 1,
     });
   }
+
+  async failOrder(order_id: number, payment_intent_id: string) {
+    return this.orderRepo.update(order_id, {
+      order_status: -1,
+      is_paid: false,
+      payment_intent_id,
+      payment_status: -1,
+    });
+  }
 }

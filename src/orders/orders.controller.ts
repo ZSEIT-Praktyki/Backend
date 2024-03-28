@@ -150,6 +150,15 @@ export class OrdersController {
 
           break;
 
+        case 'payment_intent.payment_failed':
+          // @ts-ignore
+          const { order_id } = event.data.object.charges.data[0].metadata;
+
+          await this.ordersService.failOrder(+order_id, (event.data.object as any).id);
+
+          res.status(200).send('ok');
+          break;
+
         default:
           console.warn(`Unhandled event type: ${event.type}`);
       }

@@ -44,7 +44,7 @@ export class ListingsController {
     @Query('min') min: number = 0,
     @Query('max') max: number = 9999 * 100,
     @Query('subcategory_id') subcategory_id: number,
-    @Query('sort') sort: string,
+    @Query('sort') sort: 'ASC' | 'DESC' = 'ASC',
     @Query('city') city: string,
   ) {
     try {
@@ -59,7 +59,6 @@ export class ListingsController {
       });
       return res;
     } catch (error) {
-      console.log(error);
       throw new BadRequestException({
         error,
       });
@@ -91,11 +90,11 @@ export class ListingsController {
     return this.listingsService.getPreview(id);
   }
 
-  @Get('/:id') // must be last
-  async getListingById(@Param('id') id: number, @Res() response: Response) {
+  @Get('/:id')
+  async getListingById(@Param('id') id: number) {
     try {
       const res = await this.listingsService.getListingById(id);
-      return response.send(res);
+      return res;
     } catch (error) {
       throw new NotFoundException();
     }

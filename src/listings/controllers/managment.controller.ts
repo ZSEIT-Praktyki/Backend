@@ -95,17 +95,16 @@ export class ManagmentController {
     @Param('listing_id', ParseIntPipe) listing_id: number,
     @Body() props: any,
     @User() seller_id: number,
-    @Res() response: Response,
   ) {
     try {
       await this.managmentService.hasPermission(seller_id, listing_id);
       const { affected } = await this.managmentService.updateFieldsByKeys(listing_id, props);
       if (affected > 0) {
-        return response.send({
+        return {
           statusCode: 200,
           message: 'updated',
           listing_id,
-        });
+        };
       }
       throw new BadRequestException();
     } catch (error) {

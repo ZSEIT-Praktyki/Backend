@@ -4,6 +4,16 @@ import { Between, Like, Repository } from 'typeorm';
 import { ListingsEntity } from '../entities/listings.entity';
 import { SubcategoriesEntity } from '../entities/subcategories.entity';
 
+interface QueryProps {
+  query: string;
+  page: number;
+  min: number;
+  max: number;
+  order: 'ASC' | 'DESC';
+  subcategory_id: number;
+  city: string;
+}
+
 const PAGE_SIZE = 12;
 
 @Injectable()
@@ -52,7 +62,7 @@ export class ListingsService {
     });
   }
 
-  async getByQueryText({ query = '', page = 1, min = 0, max, order, subcategory_id, city }) {
+  async getByQueryText({ query = '', page = 1, min = 0, max, order, subcategory_id, city }: QueryProps) {
     return this.listingsRepo
       .findAndCount({
         select: ['listing_id', 'title', 'price', 'images', 'added_date', 'city'],
