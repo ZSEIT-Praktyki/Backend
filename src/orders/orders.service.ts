@@ -34,7 +34,7 @@ export class OrdersService {
       .leftJoinAndSelect('list.images', 'img')
       .leftJoinAndSelect('ord.address_id', 'addr')
       .where('list.seller_id = :seller_id', { seller_id })
-      .where('ord.is_paid = :is_paid', { is_paid: true })
+      .andWhere('ord.is_paid = :is_paid', { is_paid: true })
       .getMany()
       .then((r) =>
         r.map((p) => ({
