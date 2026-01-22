@@ -12,7 +12,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { ImagesService } from '../services/images.service';
 import { Response } from 'express';
 import { createReadStream } from 'fs';
-import { join } from 'path';
+import { join, basename } from 'path';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -33,7 +33,7 @@ export class ImagesController {
   @Get('/:filename')
   getFile(@Param('filename') filename: string, @Res() res: Response) {
     const file = createReadStream(
-      join(process.cwd(), `./upload/${filename}`),
+      join(process.cwd(), `./upload/`, basename(filename)),
     ).on('error', (err) => console.warn(err));
     return file.pipe(res);
   }
